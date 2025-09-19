@@ -1,17 +1,26 @@
-import { FC } from "react";
+import { FC, useEffect, useState } from "react";
 import { v4 as uuidv4 } from "uuid"; // Import UUID for generating unique ids
 import TextField from "@mui/material/TextField";
 import IconButton from "@mui/material/IconButton";
 import Button from "@mui/material/Button";
 import { Trash04 } from "@untitled-ui/icons-react";
-import { Typography } from "@mui/material";
+import { MenuItem, Select, Typography } from "@mui/material";
 import { removeIdAndMergeArrays } from "./utils/remove-id-and-merge-array";
+import { ApiColorStoreSlice } from "@/api/ApiColorStoreSlice";
 
 interface ProductVarientsProps {
   formik: any;
 }
 
 const ProductVariants: FC<ProductVarientsProps> = ({ formik }) => {
+  const {
+    data: colorsResponse,
+    isLoading: colorIsLoading,
+    isError: colorIsError,
+    refetch: colorRefetch,
+    error: colorError,
+  } = ApiColorStoreSlice.useGetColorsQuery();
+
   // Function to add a new field to the variants array with a unique id
   const addFieldColor = (type: string) => {
     const newVariant = {
@@ -87,6 +96,21 @@ const ProductVariants: FC<ProductVarientsProps> = ({ formik }) => {
     );
     formik.setFieldValue("variantsWeight", updatedVariants);
   };
+
+  // Handle color selection
+  const handleColorSelect = (
+    event: React.ChangeEvent<{ value: unknown }>,
+    index: number
+  ) => {
+    const updatedVariants = [...formik.values.variantsColor];
+    updatedVariants[index].colorId = event.target.value as string;
+    formik.setFieldValue("variantsColor", updatedVariants);
+  };
+
+  useEffect(() => {
+    // Optionally refetch colors on mount
+    colorRefetch();
+  }, [colorRefetch]);
 
   console.log("FORMIK", formik.values);
   console.log(
@@ -178,13 +202,26 @@ const ProductVariants: FC<ProductVarientsProps> = ({ formik }) => {
                   >
                     Color ID
                   </Typography>
-                  <TextField
-                    className="capitalize MuiTextFieldOutlined--plain"
-                    name={`variantsColor[${index}].colorId`}
-                    value={variant.colorId}
-                    onChange={formik.handleChange}
+                  <Select
+                    value={variant.colorId || ""}
+                    onChange={(e) => handleColorSelect(e, index)}
+                    displayEmpty
                     fullWidth
-                  />
+                    className="capitalize"
+                    name={`variants[${index}].colorId`}
+                    disabled={colorIsLoading || colorIsError}
+                  >
+                    <MenuItem value="" disabled>
+                      Select Color
+                    </MenuItem>
+                    {colorsResponse?.data?.map(
+                      (color: { id: string; name: string }) => (
+                        <MenuItem key={color.id} value={color.id}>
+                          {color.name}
+                        </MenuItem>
+                      )
+                    )}
+                  </Select>
                 </div>
 
                 <IconButton onClick={() => removeFieldc(variant.id)}>
