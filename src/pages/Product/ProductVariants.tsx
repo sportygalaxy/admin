@@ -1,12 +1,13 @@
-import { FC, useEffect, useState } from "react";
+import { FC, useEffect } from "react";
 import { v4 as uuidv4 } from "uuid"; // Import UUID for generating unique ids
 import TextField from "@mui/material/TextField";
 import IconButton from "@mui/material/IconButton";
 import Button from "@mui/material/Button";
 import { Trash04 } from "@untitled-ui/icons-react";
-import { MenuItem, Select, Typography } from "@mui/material";
+import { MenuItem, Select, SelectChangeEvent, Typography } from "@mui/material";
 import { removeIdAndMergeArrays } from "./utils/remove-id-and-merge-array";
 import { ApiColorStoreSlice } from "@/api/ApiColorStoreSlice";
+import { ApiSizeStoreSlice } from "@/api/ApiSizeStoreSlice";
 
 interface ProductVarientsProps {
   formik: any;
@@ -20,6 +21,14 @@ const ProductVariants: FC<ProductVarientsProps> = ({ formik }) => {
     refetch: colorRefetch,
     error: colorError,
   } = ApiColorStoreSlice.useGetColorsQuery();
+
+  const {
+    data: sizesResponse,
+    isLoading: sizeIsLoading,
+    isError: sizeIsError,
+    refetch: sizeRefetch,
+    error: sizeError,
+  } = ApiSizeStoreSlice.useGetSizesQuery();
 
   // Function to add a new field to the variants array with a unique id
   const addFieldColor = (type: string) => {
@@ -98,21 +107,25 @@ const ProductVariants: FC<ProductVarientsProps> = ({ formik }) => {
   };
 
   // Handle color selection
-  const handleColorSelect = (
-    event: React.ChangeEvent<{ value: unknown }>,
-    index: number
-  ) => {
+  const handleColorSelect = (event: SelectChangeEvent<any>, index: number) => {
     const updatedVariants = [...formik.values.variantsColor];
     updatedVariants[index].colorId = event.target.value as string;
     formik.setFieldValue("variantsColor", updatedVariants);
   };
+  const handleSizeSelect = (event: SelectChangeEvent<any>, index: number) => {
+    const updatedVariants = [...formik.values.variantsSize];
+    updatedVariants[index].sizeId = event.target.value as string;
+    formik.setFieldValue("variantsSize", updatedVariants);
+  };
 
   useEffect(() => {
-    // Optionally refetch colors on mount
     colorRefetch();
   }, [colorRefetch]);
+  useEffect(() => {
+    sizeRefetch();
+  }, [sizeRefetch]);
 
-  console.log("FORMIK", formik.values);
+  console.log("FORMIK", formik.values, colorError, sizeError);
   console.log(
     "FORMIK - FLat",
     removeIdAndMergeArrays(
@@ -132,7 +145,7 @@ const ProductVariants: FC<ProductVarientsProps> = ({ formik }) => {
             color="grey.700"
             component="label"
             className="text-sm font-medium capitalize font-inter"
-            htmlFor="keyattributes"
+            htmlFor="color"
           >
             Add Color Variants
           </Typography>
@@ -146,7 +159,7 @@ const ProductVariants: FC<ProductVarientsProps> = ({ formik }) => {
                     color="grey.400"
                     component="label"
                     className="text-sm font-medium capitalize font-inter"
-                    htmlFor="keyattributes"
+                    htmlFor="price"
                   >
                     Price
                   </Typography>
@@ -172,7 +185,7 @@ const ProductVariants: FC<ProductVarientsProps> = ({ formik }) => {
                     color="grey.400"
                     component="label"
                     className="text-sm font-medium capitalize font-inter"
-                    htmlFor="keyattributes"
+                    htmlFor="stock"
                   >
                     Stock
                   </Typography>
@@ -198,7 +211,7 @@ const ProductVariants: FC<ProductVarientsProps> = ({ formik }) => {
                     color="grey.400"
                     component="label"
                     className="text-sm font-medium capitalize font-inter"
-                    htmlFor="keyattributes"
+                    htmlFor="color"
                   >
                     Color ID
                   </Typography>
@@ -246,7 +259,7 @@ const ProductVariants: FC<ProductVarientsProps> = ({ formik }) => {
             color="grey.700"
             component="label"
             className="text-sm font-medium capitalize font-inter"
-            htmlFor="keyattributes"
+            htmlFor="size"
           >
             Add Size Variants
           </Typography>
@@ -260,7 +273,7 @@ const ProductVariants: FC<ProductVarientsProps> = ({ formik }) => {
                     color="grey.400"
                     component="label"
                     className="text-sm font-medium capitalize font-inter"
-                    htmlFor="keyattributes"
+                    htmlFor="price"
                   >
                     Price
                   </Typography>
@@ -286,7 +299,7 @@ const ProductVariants: FC<ProductVarientsProps> = ({ formik }) => {
                     color="grey.400"
                     component="label"
                     className="text-sm font-medium capitalize font-inter"
-                    htmlFor="keyattributes"
+                    htmlFor="stock"
                   >
                     Stock
                   </Typography>
@@ -312,17 +325,30 @@ const ProductVariants: FC<ProductVarientsProps> = ({ formik }) => {
                     color="grey.400"
                     component="label"
                     className="text-sm font-medium capitalize font-inter"
-                    htmlFor="keyattributes"
+                    htmlFor="size"
                   >
                     Size ID
                   </Typography>
-                  <TextField
-                    className="capitalize MuiTextFieldOutlined--plain"
-                    name={`variantsSize[${index}].sizeId`}
-                    value={variant.sizeId}
-                    onChange={formik.handleChange}
+                  <Select
+                    value={variant.sizeId || ""}
+                    onChange={(e) => handleSizeSelect(e, index)}
+                    displayEmpty
                     fullWidth
-                  />
+                    className="capitalize"
+                    name={`variants[${index}].sizeId`}
+                    disabled={sizeIsLoading || sizeIsError}
+                  >
+                    <MenuItem value="" disabled>
+                      Select Size
+                    </MenuItem>
+                    {sizesResponse?.data?.map(
+                      (size: { id: string; name: string }) => (
+                        <MenuItem key={size.id} value={size.id}>
+                          {size.name}
+                        </MenuItem>
+                      )
+                    )}
+                  </Select>
                 </div>
                 <IconButton onClick={() => removeFields(variant.id)}>
                   <Trash04 className="text-red-500" />
@@ -346,7 +372,7 @@ const ProductVariants: FC<ProductVarientsProps> = ({ formik }) => {
             color="grey.700"
             component="label"
             className="text-sm font-medium capitalize font-inter"
-            htmlFor="keyattributes"
+            htmlFor="dimension"
           >
             Add Dimension Variants
           </Typography>
@@ -359,7 +385,7 @@ const ProductVariants: FC<ProductVarientsProps> = ({ formik }) => {
                     color="grey.400"
                     component="label"
                     className="text-sm font-medium capitalize font-inter"
-                    htmlFor="keyattributes"
+                    htmlFor="price"
                   >
                     Price
                   </Typography>
@@ -385,7 +411,7 @@ const ProductVariants: FC<ProductVarientsProps> = ({ formik }) => {
                     color="grey.400"
                     component="label"
                     className="text-sm font-medium capitalize font-inter"
-                    htmlFor="keyattributes"
+                    htmlFor="stock"
                   >
                     Stock
                   </Typography>
@@ -411,7 +437,7 @@ const ProductVariants: FC<ProductVarientsProps> = ({ formik }) => {
                     color="grey.400"
                     component="label"
                     className="text-sm font-medium capitalize font-inter"
-                    htmlFor="keyattributes"
+                    htmlFor="dimension"
                   >
                     Dimension eg. (2x2, 2ft, 2inches)
                   </Typography>
@@ -445,7 +471,7 @@ const ProductVariants: FC<ProductVarientsProps> = ({ formik }) => {
             color="grey.700"
             component="label"
             className="text-sm font-medium capitalize font-inter"
-            htmlFor="keyattributes"
+            htmlFor="weight"
           >
             Add Weight Variants
           </Typography>
@@ -458,7 +484,7 @@ const ProductVariants: FC<ProductVarientsProps> = ({ formik }) => {
                     color="grey.400"
                     component="label"
                     className="text-sm font-medium capitalize font-inter"
-                    htmlFor="keyattributes"
+                    htmlFor="price"
                   >
                     Price
                   </Typography>
@@ -484,7 +510,7 @@ const ProductVariants: FC<ProductVarientsProps> = ({ formik }) => {
                     color="grey.400"
                     component="label"
                     className="text-sm font-medium capitalize font-inter"
-                    htmlFor="keyattributes"
+                    htmlFor="stock"
                   >
                     Stock
                   </Typography>
@@ -510,7 +536,7 @@ const ProductVariants: FC<ProductVarientsProps> = ({ formik }) => {
                     color="grey.400"
                     component="label"
                     className="text-sm font-medium capitalize font-inter"
-                    htmlFor="keyattributes"
+                    htmlFor="weight"
                   >
                     Weight (kg, g, lbs)
                   </Typography>
