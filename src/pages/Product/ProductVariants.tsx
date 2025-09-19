@@ -1,93 +1,109 @@
 import { FC } from "react";
-import { useFormik } from "formik";
-import * as Yup from "yup";
+import { v4 as uuidv4 } from "uuid"; // Import UUID for generating unique ids
 import TextField from "@mui/material/TextField";
 import IconButton from "@mui/material/IconButton";
 import Button from "@mui/material/Button";
 import { Trash04 } from "@untitled-ui/icons-react";
 import { Typography } from "@mui/material";
+import { removeIdAndMergeArrays } from "./utils/remove-id-and-merge-array";
 
-const validationSchema = Yup.object({
-  variants: Yup.array().of(
-    Yup.object().shape({
-      price: Yup.number()
-        .required("Price is required")
-        .positive("Price must be positive"),
-      stock: Yup.number()
-        .required("Stock is required")
-        .positive("Stock must be positive"),
-      colorId: Yup.string(),
-      sizeId: Yup.string(),
-      dimension: Yup.string(),
-      weight: Yup.number().positive("Weight must be positive"),
-    })
-  ),
-});
-
-interface VariantFormValues {
-  variants: Array<{
-    price: number;
-    stock: number;
-    colorId?: string;
-    sizeId?: string;
-    dimension?: string;
-    weight?: number | string;
-  }>;
+interface ProductVarientsProps {
+  formik: any;
 }
 
-const VariantForm: FC = () => {
-  const formik = useFormik<VariantFormValues>({
-    initialValues: {
-      variants: [
-        {
-          price: 0,
-          stock: 0,
-          colorId: "0",
-        },
-        {
-          price: 0,
-          stock: 0,
-          sizeId: "0",
-        },
-        {
-          price: 0,
-          stock: 0,
-          dimension: "0",
-        },
-        {
-          price: 0,
-          stock: 0,
-          weight: "0",
-        },
-      ],
-    },
-    validationSchema,
-    onSubmit: (values) => {
-      console.log("Form Submitted", values);
-    },
-  });
-
-  const addField = (type: string) => {
-    formik.setFieldValue("variants", [
-      ...formik.values.variants,
-      { price: "0", stock: "0", [type]: "0" },
+const ProductVariants: FC<ProductVarientsProps> = ({ formik }) => {
+  // Function to add a new field to the variants array with a unique id
+  const addFieldColor = (type: string) => {
+    const newVariant = {
+      id: uuidv4(), // Generate a unique id for each new variant
+      price: 0,
+      stock: 0,
+      [type]: "0",
+    };
+    formik.setFieldValue("variantsColor", [
+      ...formik.values.variantsColor,
+      newVariant,
+    ]);
+  };
+  const addFieldSize = (type: string) => {
+    const newVariant = {
+      id: uuidv4(), // Generate a unique id for each new variant
+      price: 0,
+      stock: 0,
+      [type]: "0",
+    };
+    formik.setFieldValue("variantsSize", [
+      ...formik.values.variantsSize,
+      newVariant,
+    ]);
+  };
+  const addFieldDimension = (type: string) => {
+    const newVariant = {
+      id: uuidv4(), // Generate a unique id for each new variant
+      price: 0,
+      stock: 0,
+      [type]: "0",
+    };
+    formik.setFieldValue("variantsDimension", [
+      ...formik.values.variantsDimension,
+      newVariant,
+    ]);
+  };
+  const addFieldWeight = (type: string) => {
+    const newVariant = {
+      id: uuidv4(), // Generate a unique id for each new variant
+      price: 0,
+      stock: 0,
+      [type]: "0",
+    };
+    formik.setFieldValue("variantsWeight", [
+      ...formik.values.variantsWeight,
+      newVariant,
     ]);
   };
 
-  const removeField = (index: number) => {
-    const updatedVariants = formik.values.variants.filter(
-      (_, i) => i !== index
+  // Function to remove a specific field based on its unique id
+  const removeFieldc = (id: string) => {
+    const updatedVariantsc = formik.values.variantsColor.filter(
+      (variant) => variant.id !== id
     );
-    formik.setFieldValue("variants", updatedVariants);
+    formik.setFieldValue("variantsColor", updatedVariantsc);
+  };
+  const removeFields = (id: string) => {
+    const updatedVariants = formik.values.variantsSize.filter(
+      (variant) => variant.id !== id
+    );
+    formik.setFieldValue("variantsSize", updatedVariants);
+  };
+  const removeFieldd = (id: string) => {
+    const updatedVariants = formik.values.variantsDimension.filter(
+      (variant) => variant.id !== id
+    );
+    formik.setFieldValue("variantsDimension", updatedVariants);
+  };
+  const removeFieldw = (id: string) => {
+    const updatedVariants = formik.values.variantsWeight.filter(
+      (variant) => variant.id !== id
+    );
+    formik.setFieldValue("variantsWeight", updatedVariants);
   };
 
-  console.log("FORMIK - variants", formik.values);
+  console.log("FORMIK", formik.values);
+  console.log(
+    "FORMIK - FLat",
+    removeIdAndMergeArrays(
+      formik.values.variantsColor,
+      formik.values.variantsSize,
+      formik.values.variantsDimension,
+      formik.values.variantsWeight
+    )
+  );
 
   return (
     <div className="flex flex-col items-center justify-center">
-      <form onSubmit={formik.handleSubmit} className="w-full space-y-6">
+      <div className="w-full space-y-6">
         {/* Color Section */}
-        <div>
+        <div className="flex flex-col w-fit">
           <Typography
             color="grey.700"
             component="label"
@@ -97,10 +113,10 @@ const VariantForm: FC = () => {
             Add Color Variants
           </Typography>
 
-          {formik.values.variants
+          {formik.values.variantsColor
             .filter((variant) => variant.colorId)
             .map((variant, index) => (
-              <div key={index} className="flex mb-4 space-x-2">
+              <div key={variant.id} className="flex mb-4 space-x-2">
                 <div>
                   <Typography
                     color="grey.400"
@@ -112,16 +128,16 @@ const VariantForm: FC = () => {
                   </Typography>
                   <TextField
                     className="capitalize MuiTextFieldOutlined--plain"
-                    name={`variants[${index}].price`}
+                    name={`variantsColor[${index}].price`}
                     value={variant.price}
                     onChange={formik.handleChange}
                     error={
-                      formik.touched.variants?.[index]?.price &&
-                      Boolean(formik.errors.variants?.[index]?.price)
+                      formik.touched.variantsColor?.[index]?.price &&
+                      Boolean(formik.errors.variantsColor?.[index]?.price)
                     }
                     helperText={
-                      formik.touched.variants?.[index]?.price &&
-                      formik.errors.variants?.[index]?.price
+                      formik.touched.variantsColor?.[index]?.price &&
+                      formik.errors.variantsColor?.[index]?.price
                     }
                     fullWidth
                   />
@@ -138,16 +154,16 @@ const VariantForm: FC = () => {
                   </Typography>
                   <TextField
                     className="capitalize MuiTextFieldOutlined--plain"
-                    name={`variants[${index}].stock`}
+                    name={`variantsColor[${index}].stock`}
                     value={variant.stock}
                     onChange={formik.handleChange}
                     error={
-                      formik.touched.variants?.[index]?.stock &&
-                      Boolean(formik.errors.variants?.[index]?.stock)
+                      formik.touched.variantsColor?.[index]?.stock &&
+                      Boolean(formik.errors.variantsColor?.[index]?.stock)
                     }
                     helperText={
-                      formik.touched.variants?.[index]?.stock &&
-                      formik.errors.variants?.[index]?.stock
+                      formik.touched.variantsColor?.[index]?.stock &&
+                      formik.errors.variantsColor?.[index]?.stock
                     }
                     fullWidth
                   />
@@ -164,14 +180,14 @@ const VariantForm: FC = () => {
                   </Typography>
                   <TextField
                     className="capitalize MuiTextFieldOutlined--plain"
-                    name={`variants[${index}].colorId`}
+                    name={`variantsColor[${index}].colorId`}
                     value={variant.colorId}
                     onChange={formik.handleChange}
                     fullWidth
                   />
                 </div>
 
-                <IconButton onClick={() => removeField(index)}>
+                <IconButton onClick={() => removeFieldc(variant.id)}>
                   <Trash04 className="text-red-500" />
                 </IconButton>
               </div>
@@ -179,16 +195,16 @@ const VariantForm: FC = () => {
           <Button
             variant="ghost"
             size="small"
-            className="capitalize"
+            className="capitalize w-fit"
             type="button"
-            onClick={() => addField("colorId")}
+            onClick={() => addFieldColor("colorId")}
           >
             Add Color Variant
           </Button>
         </div>
 
         {/* Size Section */}
-        <div>
+        <div className="flex flex-col w-fit">
           <Typography
             color="grey.700"
             component="label"
@@ -198,10 +214,10 @@ const VariantForm: FC = () => {
             Add Size Variants
           </Typography>
 
-          {formik.values.variants
+          {formik.values.variantsSize
             .filter((variant) => variant.sizeId)
             .map((variant, index) => (
-              <div key={index} className="flex mb-4 space-x-2">
+              <div key={variant.id} className="flex mb-4 space-x-2">
                 <div>
                   <Typography
                     color="grey.400"
@@ -213,16 +229,16 @@ const VariantForm: FC = () => {
                   </Typography>
                   <TextField
                     className="capitalize MuiTextFieldOutlined--plain"
-                    name={`variants[${index}].price`}
+                    name={`variantsSize[${index}].price`}
                     value={variant.price}
                     onChange={formik.handleChange}
                     error={
-                      formik.touched.variants?.[index]?.price &&
-                      Boolean(formik.errors.variants?.[index]?.price)
+                      formik.touched.variantsSize?.[index]?.price &&
+                      Boolean(formik.errors.variantsSize?.[index]?.price)
                     }
                     helperText={
-                      formik.touched.variants?.[index]?.price &&
-                      formik.errors.variants?.[index]?.price
+                      formik.touched.variantsSize?.[index]?.price &&
+                      formik.errors.variantsSize?.[index]?.price
                     }
                     fullWidth
                   />
@@ -239,16 +255,16 @@ const VariantForm: FC = () => {
                   </Typography>
                   <TextField
                     className="capitalize MuiTextFieldOutlined--plain"
-                    name={`variants[${index}].stock`}
+                    name={`variantsSize[${index}].stock`}
                     value={variant.stock}
                     onChange={formik.handleChange}
                     error={
-                      formik.touched.variants?.[index]?.stock &&
-                      Boolean(formik.errors.variants?.[index]?.stock)
+                      formik.touched.variantsSize?.[index]?.stock &&
+                      Boolean(formik.errors.variantsSize?.[index]?.stock)
                     }
                     helperText={
-                      formik.touched.variants?.[index]?.stock &&
-                      formik.errors.variants?.[index]?.stock
+                      formik.touched.variantsSize?.[index]?.stock &&
+                      formik.errors.variantsSize?.[index]?.stock
                     }
                     fullWidth
                   />
@@ -265,13 +281,13 @@ const VariantForm: FC = () => {
                   </Typography>
                   <TextField
                     className="capitalize MuiTextFieldOutlined--plain"
-                    name={`variants[${index}].sizeId`}
+                    name={`variantsSize[${index}].sizeId`}
                     value={variant.sizeId}
                     onChange={formik.handleChange}
                     fullWidth
                   />
                 </div>
-                <IconButton onClick={() => removeField(index)}>
+                <IconButton onClick={() => removeFields(variant.id)}>
                   <Trash04 className="text-red-500" />
                 </IconButton>
               </div>
@@ -279,16 +295,16 @@ const VariantForm: FC = () => {
           <Button
             variant="ghost"
             size="small"
-            className="capitalize"
+            className="capitalize w-fit"
             type="button"
-            onClick={() => addField("sizeId")}
+            onClick={() => addFieldSize("sizeId")}
           >
             Add Size Variant
           </Button>
         </div>
 
         {/* Dimension Section */}
-        <div>
+        <div className="flex flex-col w-fit">
           <Typography
             color="grey.700"
             component="label"
@@ -297,10 +313,10 @@ const VariantForm: FC = () => {
           >
             Add Dimension Variants
           </Typography>
-          {formik.values.variants
+          {formik.values.variantsDimension
             .filter((variant) => variant.dimension)
             .map((variant, index) => (
-              <div key={index} className="flex mb-4 space-x-2">
+              <div key={variant.id} className="flex mb-4 space-x-2">
                 <div>
                   <Typography
                     color="grey.400"
@@ -312,16 +328,16 @@ const VariantForm: FC = () => {
                   </Typography>
                   <TextField
                     className="capitalize MuiTextFieldOutlined--plain"
-                    name={`variants[${index}].price`}
+                    name={`variantsDimension[${index}].price`}
                     value={variant.price}
                     onChange={formik.handleChange}
                     error={
-                      formik.touched.variants?.[index]?.price &&
-                      Boolean(formik.errors.variants?.[index]?.price)
+                      formik.touched.variantsDimension?.[index]?.price &&
+                      Boolean(formik.errors.variantsDimension?.[index]?.price)
                     }
                     helperText={
-                      formik.touched.variants?.[index]?.price &&
-                      formik.errors.variants?.[index]?.price
+                      formik.touched.variantsDimension?.[index]?.price &&
+                      formik.errors.variantsDimension?.[index]?.price
                     }
                     fullWidth
                   />
@@ -338,16 +354,16 @@ const VariantForm: FC = () => {
                   </Typography>
                   <TextField
                     className="capitalize MuiTextFieldOutlined--plain"
-                    name={`variants[${index}].stock`}
+                    name={`variantsDimension[${index}].stock`}
                     value={variant.stock}
                     onChange={formik.handleChange}
                     error={
-                      formik.touched.variants?.[index]?.stock &&
-                      Boolean(formik.errors.variants?.[index]?.stock)
+                      formik.touched.variantsDimension?.[index]?.stock &&
+                      Boolean(formik.errors.variantsDimension?.[index]?.stock)
                     }
                     helperText={
-                      formik.touched.variants?.[index]?.stock &&
-                      formik.errors.variants?.[index]?.stock
+                      formik.touched.variantsDimension?.[index]?.stock &&
+                      formik.errors.variantsDimension?.[index]?.stock
                     }
                     fullWidth
                   />
@@ -364,13 +380,13 @@ const VariantForm: FC = () => {
                   </Typography>
                   <TextField
                     className="capitalize MuiTextFieldOutlined--plain"
-                    name={`variants[${index}].dimension`}
+                    name={`variantsDimension[${index}].dimension`}
                     value={variant.dimension}
                     onChange={formik.handleChange}
                     fullWidth
                   />
                 </div>
-                <IconButton onClick={() => removeField(index)}>
+                <IconButton onClick={() => removeFieldd(variant.id)}>
                   <Trash04 className="text-red-500" />
                 </IconButton>
               </div>
@@ -378,16 +394,16 @@ const VariantForm: FC = () => {
           <Button
             variant="ghost"
             size="small"
-            className="capitalize"
+            className="capitalize w-fit"
             type="button"
-            onClick={() => addField("dimension")}
+            onClick={() => addFieldDimension("dimension")}
           >
             Add Dimension Variant
           </Button>
         </div>
 
         {/* Weight Section */}
-        <div>
+        <div className="flex flex-col w-fit">
           <Typography
             color="grey.700"
             component="label"
@@ -396,10 +412,10 @@ const VariantForm: FC = () => {
           >
             Add Weight Variants
           </Typography>
-          {formik.values.variants
-            .filter((variant) => variant.weight)
-            .map((variant, index) => (
-              <div key={index} className="flex mb-4 space-x-2">
+          {formik.values.variantsWeight
+            .filter((variant: any) => variant.weight)
+            .map((variant: any, index: any) => (
+              <div key={variant.id} className="flex mb-4 space-x-2">
                 <div>
                   <Typography
                     color="grey.400"
@@ -411,16 +427,16 @@ const VariantForm: FC = () => {
                   </Typography>
                   <TextField
                     className="capitalize MuiTextFieldOutlined--plain"
-                    name={`variants[${index}].price`}
+                    name={`variantsWeight[${index}].price`}
                     value={variant.price}
                     onChange={formik.handleChange}
                     error={
-                      formik.touched.variants?.[index]?.price &&
-                      Boolean(formik.errors.variants?.[index]?.price)
+                      formik.touched.variantsWeight?.[index]?.price &&
+                      Boolean(formik.errors.variantsWeight?.[index]?.price)
                     }
                     helperText={
-                      formik.touched.variants?.[index]?.price &&
-                      formik.errors.variants?.[index]?.price
+                      formik.touched.variantsWeight?.[index]?.price &&
+                      formik.errors.variantsWeight?.[index]?.price
                     }
                     fullWidth
                   />
@@ -437,16 +453,16 @@ const VariantForm: FC = () => {
                   </Typography>
                   <TextField
                     className="capitalize MuiTextFieldOutlined--plain"
-                    name={`variants[${index}].stock`}
+                    name={`variantsWeight[${index}].stock`}
                     value={variant.stock}
                     onChange={formik.handleChange}
                     error={
-                      formik.touched.variants?.[index]?.stock &&
-                      Boolean(formik.errors.variants?.[index]?.stock)
+                      formik.touched.variantsWeight?.[index]?.stock &&
+                      Boolean(formik.errors.variantsWeight?.[index]?.stock)
                     }
                     helperText={
-                      formik.touched.variants?.[index]?.stock &&
-                      formik.errors.variants?.[index]?.stock
+                      formik.touched.variantsWeight?.[index]?.stock &&
+                      formik.errors.variantsWeight?.[index]?.stock
                     }
                     fullWidth
                   />
@@ -463,13 +479,13 @@ const VariantForm: FC = () => {
                   </Typography>
                   <TextField
                     className="capitalize MuiTextFieldOutlined--plain"
-                    name={`variants[${index}].weight`}
+                    name={`variantsWeight[${index}].weight`}
                     value={variant.weight}
                     onChange={formik.handleChange}
                     fullWidth
                   />
                 </div>
-                <IconButton onClick={() => removeField(index)}>
+                <IconButton onClick={() => removeFieldw(variant.id)}>
                   <Trash04 className="text-red-500" />
                 </IconButton>
               </div>
@@ -477,16 +493,16 @@ const VariantForm: FC = () => {
           <Button
             variant="ghost"
             size="small"
-            className="capitalize"
+            className="capitalize w-fit"
             type="button"
-            onClick={() => addField("weight")}
+            onClick={() => addFieldWeight("weight")}
           >
             Add Weight Variant
           </Button>
         </div>
-      </form>
+      </div>
     </div>
   );
 };
 
-export default VariantForm;
+export default ProductVariants;

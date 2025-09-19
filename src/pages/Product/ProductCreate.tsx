@@ -36,6 +36,7 @@ import { LoadingButton } from "@mui/lab";
 import useToggle from "@/hooks/useToggle";
 import DropdownIcon from "@/common/SVG/DropdownIcon";
 import ProductVariants from "./ProductVariants";
+import { removeIdAndMergeArrays } from "./utils/remove-id-and-merge-array";
 // import { routeEnum } from "@/constants/RouteConstants";
 
 type TCategories = {
@@ -96,9 +97,25 @@ const validationSchema = Yup.object({
       value: Yup.string().required("Value is required"),
     })
   ),
+  variants: Yup.array().of(
+    Yup.object().shape({
+      price: Yup.number()
+        .required("Price is required")
+        .positive("Price must be positive"),
+      stock: Yup.number()
+        .required("Stock is required")
+        .positive("Stock must be positive"),
+      colorId: Yup.string(),
+      sizeId: Yup.string(),
+      dimension: Yup.string(),
+      weight: Yup.number().positive("Weight must be positive"),
+    })
+  ),
 });
 
-interface ProductCreateProps {}
+interface ProductCreateProps {
+  //
+}
 const ProductCreate: FC<ProductCreateProps> = () => {
   const navigate = useNavigate();
   const { showSuccessSnackbar, showErrorSnackbar } = useExtendedSnackbar();
@@ -176,6 +193,32 @@ const ProductCreate: FC<ProductCreateProps> = () => {
       medias: [],
       specification: [{ key: "", value: "" }],
       keyattribute: [{ key: "", value: "" }],
+      variantsColor: [],
+      variantsSize: [],
+      variantsDimension: [],
+      variantsWeight: [],
+      variants: [
+        // {
+        //   price: 0,
+        //   stock: 0,
+        //   colorId: "0",
+        // },
+        // {
+        //   price: 0,
+        //   stock: 0,
+        //   sizeId: "0",
+        // },
+        // {
+        //   price: 0,
+        //   stock: 0,
+        //   dimension: "0",
+        // },
+        // {
+        //   price: 0,
+        //   stock: 0,
+        //   weight: "0",
+        // },
+      ],
     },
     validationSchema,
     onSubmit: async (values) => {
@@ -208,6 +251,12 @@ const ProductCreate: FC<ProductCreateProps> = () => {
           medias: formattedMediaArray,
           specification: formattedSpecificationArray,
           keyattribute: formattedKeyattributeArray,
+          variants: removeIdAndMergeArrays(
+            values.variantsColor,
+            values.variantsSize,
+            values.variantsDimension,
+            values.variantsWeight
+          ),
         };
 
         // Handle submission to backend
@@ -770,7 +819,7 @@ const ProductCreate: FC<ProductCreateProps> = () => {
         <div className="flex flex-col col-span-2 gap-4">
           <ProductSpecification formik={formik} />
           <ProductKeyattribute formik={formik} />
-          <ProductVariants />
+          <ProductVariants formik={formik} />
         </div>
 
         <div className="pt-4 pb-6 w-fit">
