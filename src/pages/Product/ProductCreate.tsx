@@ -35,6 +35,7 @@ import SportygalaxyLoadingIndicator from "@/common/Loading/SportygalaxyLoadingIn
 import { LoadingButton } from "@mui/lab";
 import useToggle from "@/hooks/useToggle";
 import DropdownIcon from "@/common/SVG/DropdownIcon";
+import ProductVariants from "./ProductVariants";
 // import { routeEnum } from "@/constants/RouteConstants";
 
 type TCategories = {
@@ -254,7 +255,7 @@ const ProductCreate: FC<ProductCreateProps> = () => {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         <ProductSingleImageUploader formik={formik} />
         <ProductImageUploader formik={formik} />
         <ProductVideoUploader formik={formik} />
@@ -262,24 +263,24 @@ const ProductCreate: FC<ProductCreateProps> = () => {
 
       <form
         onSubmit={formik.handleSubmit}
-        className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8 mt-8"
+        className="grid grid-cols-1 gap-4 mt-8 md:grid-cols-2 md:gap-8"
       >
         {/* <div {...getRootProps()} className="dropzone">
           <input {...getInputProps()} />
           <p>Drag 'n' drop the display image here, or click to select files</p>
         </div> */}
 
-        <div className="flex flex-col space-y-1 col-span-2 md:col-span-1">
+        <div className="flex flex-col col-span-2 space-y-1 md:col-span-1">
           <Typography
             color="grey.500"
             component="label"
-            className="font-medium text-sm font-inter"
+            className="text-sm font-medium font-inter"
             htmlFor="completeVideo"
           >
             Paste Link to youTube video here
           </Typography>
           <TextField
-            className="MuiTextFieldOutlined--plain capitalize"
+            className="capitalize MuiTextFieldOutlined--plain"
             placeholder="https://www.youtube.com/watch?v=6qg7UHgkq-U"
             id="completeVideo"
             name="completeVideo"
@@ -299,11 +300,11 @@ const ProductCreate: FC<ProductCreateProps> = () => {
           />
         </div>
 
-        <div className="flex flex-col space-y-1 col-span-2 md:col-span-1">
+        <div className="flex flex-col col-span-2 space-y-1 md:col-span-1">
           <Typography
             color="grey.700"
             component="label"
-            className="font-medium text-sm font-inter capitalize"
+            className="text-sm font-medium capitalize font-inter"
             htmlFor="productName"
           >
             <span className="text-[#D92D20] text-sm font-medium font-inter">
@@ -312,7 +313,7 @@ const ProductCreate: FC<ProductCreateProps> = () => {
             Product Name
           </Typography>
           <TextField
-            className="MuiTextFieldOutlined--plain capitalize"
+            className="capitalize MuiTextFieldOutlined--plain"
             placeholder="Enter product name here"
             name="name"
             id="productName"
@@ -326,17 +327,17 @@ const ProductCreate: FC<ProductCreateProps> = () => {
           />
         </div>
 
-        <div className="flex flex-col space-y-1 col-span-2">
+        <div className="flex flex-col col-span-2 space-y-1">
           <Typography
             color="grey.700"
             component="label"
-            className="font-medium text-sm font-inter capitalize"
+            className="text-sm font-medium capitalize font-inter"
             htmlFor="description"
           >
             Product Description
           </Typography>
           <TextField
-            className="MuiTextFieldOutlined--plain capitalize"
+            className="capitalize MuiTextFieldOutlined--plain"
             placeholder="Enter product description here"
             name="description"
             id="description"
@@ -358,7 +359,7 @@ const ProductCreate: FC<ProductCreateProps> = () => {
           <Typography
             color="grey.700"
             component="label"
-            className="font-medium text-sm font-inter capitalize"
+            className="text-sm font-medium capitalize font-inter"
             htmlFor="price"
           >
             <span className="text-[#D92D20] text-sm font-medium font-inter">
@@ -367,7 +368,7 @@ const ProductCreate: FC<ProductCreateProps> = () => {
             Product Price
           </Typography>
           <TextField
-            className="MuiTextFieldOutlined--plain capitalize"
+            className="capitalize MuiTextFieldOutlined--plain"
             placeholder="Enter product price here"
             name="price"
             id="price"
@@ -386,7 +387,7 @@ const ProductCreate: FC<ProductCreateProps> = () => {
           <Typography
             color="grey.700"
             component="label"
-            className="font-medium text-sm font-inter capitalize"
+            className="text-sm font-medium capitalize font-inter"
             htmlFor="salesPrice"
           >
             <span className="text-[#D92D20] text-sm font-medium font-inter hidden">
@@ -395,7 +396,7 @@ const ProductCreate: FC<ProductCreateProps> = () => {
             Product Sales Price
           </Typography>
           <TextField
-            className="MuiTextFieldOutlined--plain capitalize"
+            className="capitalize MuiTextFieldOutlined--plain"
             placeholder="Enter product salesPrice here"
             name="salesPrice"
             id="salesPrice"
@@ -416,13 +417,13 @@ const ProductCreate: FC<ProductCreateProps> = () => {
           <Typography
             color="grey.700"
             component="label"
-            className="font-medium text-sm font-inter capitalize"
+            className="text-sm font-medium capitalize font-inter"
             htmlFor="stock"
           >
             Stock Count
           </Typography>
           <TextField
-            className="MuiTextFieldOutlined--plain capitalize"
+            className="capitalize MuiTextFieldOutlined--plain"
             placeholder="Enter stock count"
             id="stock"
             name="stock"
@@ -437,11 +438,11 @@ const ProductCreate: FC<ProductCreateProps> = () => {
           />
         </div>
 
-        <div className="flex flex-col space-y-1 col-span-2 md:col-span-1">
+        <div className="flex flex-col col-span-2 space-y-1 md:col-span-1">
           <Typography
             color="grey.700"
             component="label"
-            className="font-medium text-sm font-inter capitalize"
+            className="text-sm font-medium capitalize font-inter"
             htmlFor="categoryId"
           >
             <span className="text-[#D92D20] text-sm font-medium font-inter">
@@ -452,7 +453,7 @@ const ProductCreate: FC<ProductCreateProps> = () => {
           <FormControl fullWidth margin="normal">
             <Select
               displayEmpty
-              className="MuiTextFieldOutlined--plain text-sm capitalize font-inter"
+              className="text-sm capitalize MuiTextFieldOutlined--plain font-inter"
               id="categoryId"
               name="categoryId"
               value={formik.values.categoryId}
@@ -478,7 +479,7 @@ const ProductCreate: FC<ProductCreateProps> = () => {
               renderValue={(selected) => {
                 if (selected === "") {
                   return (
-                    <span className="text-sm text-gray-400 font-medium normal-case">
+                    <span className="text-sm font-medium text-gray-400 normal-case">
                       Choose category
                     </span>
                   );
@@ -517,11 +518,11 @@ const ProductCreate: FC<ProductCreateProps> = () => {
         </div>
 
         {categoryId && (
-          <div className="flex flex-col space-y-1 col-span-2 md:col-span-1">
+          <div className="flex flex-col col-span-2 space-y-1 md:col-span-1">
             <Typography
               color="grey.700"
               component="label"
-              className="font-medium text-sm font-inter capitalize"
+              className="text-sm font-medium capitalize font-inter"
               htmlFor="subcategoryId"
             >
               <span className="text-[#D92D20] text-sm font-medium font-inter">
@@ -532,7 +533,7 @@ const ProductCreate: FC<ProductCreateProps> = () => {
             <FormControl fullWidth margin="normal">
               <Select
                 displayEmpty
-                className="MuiTextFieldOutlined--plain text-sm capitalize font-inter"
+                className="text-sm capitalize MuiTextFieldOutlined--plain font-inter"
                 id="subcategoryId"
                 name="subcategoryId"
                 value={formik.values.subcategoryId}
@@ -556,7 +557,7 @@ const ProductCreate: FC<ProductCreateProps> = () => {
                 renderValue={(selected): any => {
                   if (selected === "") {
                     return (
-                      <span className="text-sm text-gray-400 font-medium normal-case">
+                      <span className="text-sm font-medium text-gray-400 normal-case">
                         Choose sub category
                       </span>
                     );
@@ -586,11 +587,11 @@ const ProductCreate: FC<ProductCreateProps> = () => {
           </div>
         )}
 
-        <div className="flex flex-col space-y-1 col-span-2 md:col-span-1">
+        <div className="flex flex-col col-span-2 space-y-1 md:col-span-1">
           <Typography
             color="grey.700"
             component="label"
-            className="font-medium text-sm font-inter capitalize"
+            className="text-sm font-medium capitalize font-inter"
             htmlFor="sizeIds"
           >
             Sizes
@@ -598,7 +599,7 @@ const ProductCreate: FC<ProductCreateProps> = () => {
           <FormControl fullWidth margin="normal">
             <Select
               displayEmpty
-              className="MuiTextFieldOutlined--plain text-sm capitalize font-inter"
+              className="text-sm capitalize MuiTextFieldOutlined--plain font-inter"
               id="sizeIds"
               multiple
               name="sizeIds"
@@ -621,7 +622,7 @@ const ProductCreate: FC<ProductCreateProps> = () => {
                 // Handle placeholder when nothing is selected
                 if (selected.length === 0) {
                   return (
-                    <span className="text-sm text-gray-400 font-medium normal-case">
+                    <span className="text-sm font-medium text-gray-400 normal-case">
                       Choose sizes
                     </span>
                   );
@@ -676,11 +677,11 @@ const ProductCreate: FC<ProductCreateProps> = () => {
           </FormControl>
         </div>
 
-        <div className="flex flex-col space-y-1 col-span-2 md:col-span-1">
+        <div className="flex flex-col col-span-2 space-y-1 md:col-span-1">
           <Typography
             color="grey.700"
             component="label"
-            className="font-medium text-sm font-inter capitalize"
+            className="text-sm font-medium capitalize font-inter"
             htmlFor="sizeIds"
           >
             Colors
@@ -688,7 +689,7 @@ const ProductCreate: FC<ProductCreateProps> = () => {
           <FormControl fullWidth margin="normal">
             <Select
               displayEmpty
-              className="MuiTextFieldOutlined--plain text-sm capitalize font-inter"
+              className="text-sm capitalize MuiTextFieldOutlined--plain font-inter"
               id="colorIds"
               multiple
               name="colorIds"
@@ -711,7 +712,7 @@ const ProductCreate: FC<ProductCreateProps> = () => {
                 // Handle placeholder when nothing is selected
                 if (selected.length === 0) {
                   return (
-                    <span className="text-sm text-gray-400 font-medium normal-case">
+                    <span className="text-sm font-medium text-gray-400 normal-case">
                       Choose colors
                     </span>
                   );
@@ -766,16 +767,17 @@ const ProductCreate: FC<ProductCreateProps> = () => {
           </FormControl>
         </div>
 
-        <div className="flex flex-col gap-4 col-span-2">
+        <div className="flex flex-col col-span-2 gap-4">
           <ProductSpecification formik={formik} />
           <ProductKeyattribute formik={formik} />
+          <ProductVariants />
         </div>
 
         <div className="pt-4 pb-6 w-fit">
           <LoadingButton
             disabled={isLoading}
             type="submit"
-            className="font-inter capitalize font-medium"
+            className="font-medium capitalize font-inter"
             variant="contained"
             loading={createProductResult.isLoading}
             color="primary"
