@@ -34,6 +34,11 @@ import BackButton from "@/common/BackButton";
 import { LoadingButton } from "@mui/lab";
 import DropdownIcon from "@/common/SVG/DropdownIcon";
 import useToggle from "@/hooks/useToggle";
+import ProductVariants from "./ProductVariants";
+import {
+  mergeArrays,
+} from "./utils/remove-id-and-merge-array";
+import { convertPriceAndStockToNumber } from "./utils/clean-array";
 
 type TCategories = {
   id: string;
@@ -77,8 +82,8 @@ const validationSchema = Yup.object({
   stock: Yup.number().optional().integer("Stock must be an integer"),
   categoryId: Yup.string().required("Category is required").optional(),
   subcategoryId: Yup.string().required("Subcategory is required").optional(),
-  sizeIds: Yup.array().min(1, "Select at least one size"),
-  colorIds: Yup.array().min(1, "Select at least one color"),
+  sizeIds: Yup.array().min(0, "Select at least one size").optional(),
+  colorIds: Yup.array().min(0, "Select at least one color").optional(),
   specification: Yup.array().of(
     Yup.object().shape({
       key: Yup.string().required("Key is required").optional(),
@@ -191,6 +196,12 @@ const ProductUpdate: FC<ProductUpdateProps> = () => {
       keyattribute: productInfoResponse?.keyattribute || [
         { key: "", value: "" },
       ],
+
+      variantsColor: [],
+      variantsSize: [],
+      variantsDimension: [],
+      variantsWeight: [],
+      variants: productInfoResponse?.variants || [],
     },
     validationSchema,
     onSubmit: async (values) => {
@@ -206,6 +217,14 @@ const ProductUpdate: FC<ProductUpdateProps> = () => {
         );
         const formattedKeyattributeArray = formatKeyValuePair(
           values.keyattribute
+        );
+        const formattedVariantsArray = convertPriceAndStockToNumber(
+          mergeArrays(
+            values.variantsColor,
+            values.variantsSize,
+            values.variantsDimension,
+            values.variantsWeight
+          )
         );
 
         const validatePayload = (values: any) => {
@@ -226,12 +245,14 @@ const ProductUpdate: FC<ProductUpdateProps> = () => {
             "medias",
             "specification",
             "keyattribute",
+            "variants",
           ];
 
           fields.forEach((field) => {
             const value = values[field];
 
-            // Check for the value to ensure it's not undefined, an empty string, or an empty array
+            if (value === "colorIds" || value === "sizeIds")
+              return (payload[field] = value);
             if (
               value !== undefined &&
               value !== "" &&
@@ -239,6 +260,7 @@ const ProductUpdate: FC<ProductUpdateProps> = () => {
               (Array.isArray(value) ? value.length > 0 : true) &&
               (typeof value !== "number" || !isNaN(value)) // Exclude NaN values for numbers
             ) {
+              // Check for the value to ensure it's not undefined, an empty string, or an empty array
               payload[field] = value;
             }
           });
@@ -254,6 +276,10 @@ const ProductUpdate: FC<ProductUpdateProps> = () => {
 
           if (values.keyattribute && values.keyattribute.length > 0) {
             payload.keyattribute = formattedKeyattributeArray; // Assuming `formattedKeyattributeArray` is already defined
+          }
+
+          if (values.variants && values.variants.length > 0) {
+            payload.variants = formattedVariantsArray; // Assuming `formattedKeyattributeArray` is already defined
           }
 
           return payload;
@@ -273,6 +299,7 @@ const ProductUpdate: FC<ProductUpdateProps> = () => {
           medias: values.medias,
           specification: formattedSpecificationArray,
           keyattribute: formattedKeyattributeArray,
+          variants: formattedVariantsArray,
         };
 
         // console.log("DATA ::", {
@@ -327,6 +354,11 @@ const ProductUpdate: FC<ProductUpdateProps> = () => {
         medias: productData?.medias || [],
         specification: productData?.specification || [{ key: "", value: "" }],
         keyattribute: productData?.keyattribute || [{ key: "", value: "" }],
+        variantsColor: [],
+        variantsSize: [],
+        variantsDimension: [],
+        variantsWeight: [],
+        variants: productData?.variants || [],
       });
     }
   }, [getProductInfoQuery?.data]);
@@ -374,7 +406,7 @@ const ProductUpdate: FC<ProductUpdateProps> = () => {
         </Button>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         <ProductSingleImageUploader formik={formik} />
         <ProductImageUploader formik={formik} />
         <ProductVideoUploader formik={formik} />
@@ -382,24 +414,24 @@ const ProductUpdate: FC<ProductUpdateProps> = () => {
 
       <form
         // onSubmit={formik.handleSubmit}
-        className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8 mt-8"
+        className="grid grid-cols-1 gap-4 mt-8 md:grid-cols-2 md:gap-8"
       >
         {/* <div {...getRootProps()} className="dropzone">
           <input {...getInputProps()} />
           <p>Drag 'n' drop the display image here, or click to select files</p>
         </div> */}
 
-        <div className="flex flex-col space-y-1 col-span-2 md:col-span-1">
+        <div className="flex flex-col col-span-2 space-y-1 md:col-span-1">
           <Typography
             color="grey.500"
             component="label"
-            className="font-medium text-sm font-inter"
+            className="text-sm font-medium font-inter"
             htmlFor="completeVideo"
           >
             Paste Link to youTube video here
           </Typography>
           <TextField
-            className="MuiTextFieldOutlined--plain capitalize"
+            className="capitalize MuiTextFieldOutlined--plain"
             placeholder="https://www.youtube.com/watch?v=6qg7UHgkq-U"
             id="completeVideo"
             name="completeVideo"
@@ -420,11 +452,11 @@ const ProductUpdate: FC<ProductUpdateProps> = () => {
           />
         </div>
 
-        <div className="flex flex-col space-y-1 col-span-2 md:col-span-1">
+        <div className="flex flex-col col-span-2 space-y-1 md:col-span-1">
           <Typography
             color="grey.700"
             component="label"
-            className="font-medium text-sm font-inter capitalize"
+            className="text-sm font-medium capitalize font-inter"
             htmlFor="productName"
           >
             <span className="text-[#D92D20] text-sm font-medium font-inter">
@@ -433,7 +465,7 @@ const ProductUpdate: FC<ProductUpdateProps> = () => {
             Product Name
           </Typography>
           <TextField
-            className="MuiTextFieldOutlined--plain capitalize"
+            className="capitalize MuiTextFieldOutlined--plain"
             placeholder="Enter product name here"
             name="name"
             id="productName"
@@ -447,17 +479,17 @@ const ProductUpdate: FC<ProductUpdateProps> = () => {
           />
         </div>
 
-        <div className="flex flex-col space-y-1 col-span-2">
+        <div className="flex flex-col col-span-2 space-y-1">
           <Typography
             color="grey.700"
             component="label"
-            className="font-medium text-sm font-inter capitalize"
+            className="text-sm font-medium capitalize font-inter"
             htmlFor="description"
           >
             Product Description
           </Typography>
           <TextField
-            className="MuiTextFieldOutlined--plain capitalize"
+            className="capitalize MuiTextFieldOutlined--plain"
             placeholder="Enter product description here"
             name="description"
             id="description"
@@ -481,7 +513,7 @@ const ProductUpdate: FC<ProductUpdateProps> = () => {
           <Typography
             color="grey.700"
             component="label"
-            className="font-medium text-sm font-inter capitalize"
+            className="text-sm font-medium capitalize font-inter"
             htmlFor="price"
           >
             <span className="text-[#D92D20] text-sm font-medium font-inter">
@@ -490,7 +522,7 @@ const ProductUpdate: FC<ProductUpdateProps> = () => {
             Product Price
           </Typography>
           <TextField
-            className="MuiTextFieldOutlined--plain capitalize"
+            className="capitalize MuiTextFieldOutlined--plain"
             placeholder="Enter product price here"
             name="price"
             id="price"
@@ -509,7 +541,7 @@ const ProductUpdate: FC<ProductUpdateProps> = () => {
           <Typography
             color="grey.700"
             component="label"
-            className="font-medium text-sm font-inter capitalize"
+            className="text-sm font-medium capitalize font-inter"
             htmlFor="salesPrice"
           >
             <span className="text-[#D92D20] text-sm font-medium font-inter hidden">
@@ -518,7 +550,7 @@ const ProductUpdate: FC<ProductUpdateProps> = () => {
             Product Sales Price
           </Typography>
           <TextField
-            className="MuiTextFieldOutlined--plain capitalize"
+            className="capitalize MuiTextFieldOutlined--plain"
             placeholder="Enter product sales price here"
             name="salesPrice"
             id="salesPrice"
@@ -541,14 +573,14 @@ const ProductUpdate: FC<ProductUpdateProps> = () => {
           <Typography
             color="grey.700"
             component="label"
-            className="font-medium text-sm font-inter capitalize"
+            className="text-sm font-medium capitalize font-inter"
             htmlFor="stock"
           >
             Add Stock Count
           </Typography>
 
           <TextField
-            className="MuiTextFieldOutlined--plain capitalize"
+            className="capitalize MuiTextFieldOutlined--plain"
             placeholder="Enter stock count"
             id="stock"
             name="stock"
@@ -565,18 +597,18 @@ const ProductUpdate: FC<ProductUpdateProps> = () => {
           <Typography
             color="error"
             component="label"
-            className="font-light text-xs font-inter capitalize"
+            className="text-xs font-light capitalize font-inter"
             htmlFor="stock"
           >
             remaining ({productInfoResponse?.stock || 0})
           </Typography>
         </div>
 
-        <div className="flex flex-col space-y-1 col-span-2 md:col-span-1">
+        <div className="flex flex-col col-span-2 space-y-1 md:col-span-1">
           <Typography
             color="grey.700"
             component="label"
-            className="font-medium text-sm font-inter capitalize"
+            className="text-sm font-medium capitalize font-inter"
             htmlFor="categoryId"
           >
             <span className="text-[#D92D20] text-sm font-medium font-inter">
@@ -587,7 +619,7 @@ const ProductUpdate: FC<ProductUpdateProps> = () => {
           <FormControl fullWidth margin="normal">
             <Select
               displayEmpty
-              className="MuiTextFieldOutlined--plain text-sm capitalize font-inter"
+              className="text-sm capitalize MuiTextFieldOutlined--plain font-inter"
               id="categoryId"
               name="categoryId"
               value={formik.values.categoryId}
@@ -613,7 +645,7 @@ const ProductUpdate: FC<ProductUpdateProps> = () => {
               renderValue={(selected) => {
                 if (selected === "") {
                   return (
-                    <span className="text-sm text-gray-400 font-medium normal-case">
+                    <span className="text-sm font-medium text-gray-400 normal-case">
                       Choose category
                     </span>
                   );
@@ -652,11 +684,11 @@ const ProductUpdate: FC<ProductUpdateProps> = () => {
         </div>
 
         {categoryId && (
-          <div className="flex flex-col space-y-1 col-span-2 md:col-span-1">
+          <div className="flex flex-col col-span-2 space-y-1 md:col-span-1">
             <Typography
               color="grey.700"
               component="label"
-              className="font-medium text-sm font-inter capitalize"
+              className="text-sm font-medium capitalize font-inter"
               htmlFor="subcategoryId"
             >
               <span className="text-[#D92D20] text-sm font-medium font-inter">
@@ -667,7 +699,7 @@ const ProductUpdate: FC<ProductUpdateProps> = () => {
             <FormControl fullWidth margin="normal">
               <Select
                 displayEmpty
-                className="MuiTextFieldOutlined--plain text-sm capitalize font-inter"
+                className="text-sm capitalize MuiTextFieldOutlined--plain font-inter"
                 id="subcategoryId"
                 name="subcategoryId"
                 value={formik.values.subcategoryId}
@@ -691,7 +723,7 @@ const ProductUpdate: FC<ProductUpdateProps> = () => {
                 renderValue={(selected): any => {
                   if (selected === "") {
                     return (
-                      <span className="text-sm text-gray-400 font-medium normal-case">
+                      <span className="text-sm font-medium text-gray-400 normal-case">
                         Choose sub category
                       </span>
                     );
@@ -721,11 +753,11 @@ const ProductUpdate: FC<ProductUpdateProps> = () => {
           </div>
         )}
 
-        <div className="flex flex-col space-y-1 col-span-2 md:col-span-1">
+        <div className="flex flex-col col-span-2 space-y-1 md:col-span-1">
           <Typography
             color="grey.700"
             component="label"
-            className="font-medium text-sm font-inter capitalize"
+            className="text-sm font-medium capitalize font-inter"
             htmlFor="sizeIds"
           >
             Sizes
@@ -733,7 +765,7 @@ const ProductUpdate: FC<ProductUpdateProps> = () => {
           <FormControl fullWidth margin="normal">
             <Select
               displayEmpty
-              className="MuiTextFieldOutlined--plain text-sm capitalize font-inter"
+              className="text-sm capitalize MuiTextFieldOutlined--plain font-inter"
               id="sizeIds"
               multiple
               name="sizeIds"
@@ -756,7 +788,7 @@ const ProductUpdate: FC<ProductUpdateProps> = () => {
                 // Handle placeholder when nothing is selected
                 if (selected.length === 0) {
                   return (
-                    <span className="text-sm text-gray-400 font-medium normal-case">
+                    <span className="text-sm font-medium text-gray-400 normal-case">
                       Choose sizes
                     </span>
                   );
@@ -811,11 +843,11 @@ const ProductUpdate: FC<ProductUpdateProps> = () => {
           </FormControl>
         </div>
 
-        <div className="flex flex-col space-y-1 col-span-2 md:col-span-1">
+        <div className="flex flex-col col-span-2 space-y-1 md:col-span-1">
           <Typography
             color="grey.700"
             component="label"
-            className="font-medium text-sm font-inter capitalize"
+            className="text-sm font-medium capitalize font-inter"
             htmlFor="sizeIds"
           >
             Colors
@@ -823,7 +855,7 @@ const ProductUpdate: FC<ProductUpdateProps> = () => {
           <FormControl fullWidth margin="normal">
             <Select
               displayEmpty
-              className="MuiTextFieldOutlined--plain text-sm capitalize font-inter"
+              className="text-sm capitalize MuiTextFieldOutlined--plain font-inter"
               id="colorIds"
               multiple
               name="colorIds"
@@ -846,7 +878,7 @@ const ProductUpdate: FC<ProductUpdateProps> = () => {
                 // Handle placeholder when nothing is selected
                 if (selected.length === 0) {
                   return (
-                    <span className="text-sm text-gray-400 font-medium normal-case">
+                    <span className="text-sm font-medium text-gray-400 normal-case">
                       Choose colors
                     </span>
                   );
@@ -899,7 +931,7 @@ const ProductUpdate: FC<ProductUpdateProps> = () => {
           </FormControl>
         </div>
 
-        <div className="flex flex-col gap-4 col-span-2">
+        <div className="flex flex-col col-span-2 gap-4">
           <ProductSpecification
             formik={formik}
             initialSpecifications={productInfoResponse.specification || []}
@@ -907,6 +939,10 @@ const ProductUpdate: FC<ProductUpdateProps> = () => {
           <ProductKeyattribute
             formik={formik}
             initialKeyattributes={productInfoResponse?.keyattribute || []}
+          />
+          <ProductVariants
+            formik={formik}
+            initialVariants={productInfoResponse?.variants || []}
           />
         </div>
 
@@ -916,7 +952,7 @@ const ProductUpdate: FC<ProductUpdateProps> = () => {
             loading={updateProductResult.isLoading}
             type="button"
             onClick={() => formik.handleSubmit()}
-            className="capitalize font-semibold text-base font-inter md:px-10"
+            className="text-base font-semibold capitalize font-inter md:px-10"
             variant="contained"
             color="primary"
             fullWidth
