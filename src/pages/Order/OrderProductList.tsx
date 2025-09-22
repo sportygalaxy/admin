@@ -13,7 +13,7 @@ const OrderProductList = ({ items }: { items: any }) => {
 
       <div className="grid grid-cols-1 mt-2 md:grid-cols-3">
         {items.map((item: any) => {
-          const { product, price } = item;
+          const { product, price, quantity } = item;
           const displayImage = product?.displayImage || "";
           const name = product?.name || "Unnamed Product";
           const productId = product?.id || "";
@@ -52,9 +52,10 @@ const OrderProductList = ({ items }: { items: any }) => {
                   <Typography className="font-light leading-normal tracking-wide text-black font-jost text-mobile-xl md:text-lg">
                     Price: {formatCurrency(price || 0)}
                   </Typography>
-                  {/* <Typography className="font-light leading-normal tracking-wide text-black font-jost text-mobile-xl md:text-lg">
+                  <Typography className="font-light leading-normal tracking-wide text-black font-jost text-mobile-xl md:text-lg">
                     Quantity: {quantity}
                   </Typography>
+                  {/* 
                   <Typography className="font-light leading-normal tracking-wide text-black font-jost text-mobile-xl md:text-lg">
                     Color: {color || "N/A"}
                   </Typography>
