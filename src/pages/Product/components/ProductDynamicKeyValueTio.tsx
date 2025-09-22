@@ -39,25 +39,28 @@ const ProductDynamicKeyValueTio: React.FC<ProductDynamicKeyValueTioProps> = ({
     amountToPay: "Total Amount Paid Price",
   };
 
-  // Transform the data into a key-value pair format with custom key names (falling back to defaults if not provided)
-  const transformedData = data.map((item) => {
-    const keyValuePairs: Record<string, string> = {};
-    Object.keys(item)?.forEach((key) => {
-      // Exclude `id` property as it's not needed in the key-value pair
-      if (key !== "id") {
-        // Use custom name if available, else fallback to default (original key)
-        const customKey = keyMapping[key] || key;
-        // keyValuePairs[customKey] = item[key] ? item[key].toString() : "";
-        // If it's a price-related field, apply currency formatting
-        if (customKey.includes("Price") || customKey === "Total Price") {
-          keyValuePairs[customKey] = formatCurrency(item[key]);
-        } else {
-          keyValuePairs[customKey] = item[key] ? item[key].toString() : "";
-        }
+const transformedData = data?.map((item) => {
+  if (!item) return {}; // Skip undefined or null items
+
+  const keyValuePairs: Record<string, string> = {};
+  Object.keys(item)?.forEach((key) => {
+    // Exclude `id` property as it's not needed in the key-value pair
+    if (key !== "id") {
+      // Use custom name if available, else fallback to default (original key)
+      const customKey = keyMapping[key] || key;
+
+      // If it's a price-related field, apply currency formatting
+      if (customKey.includes("Price") || customKey === "Total Price") {
+        keyValuePairs[customKey] = formatCurrency(item[key]);
+      } else {
+        keyValuePairs[customKey] = item[key] ? item[key].toString() : "";
       }
-    });
-    return keyValuePairs;
+    }
   });
+
+  return keyValuePairs;
+});
+
 
   return (
     <div className="mb-6">
@@ -82,7 +85,7 @@ const ProductDynamicKeyValueTio: React.FC<ProductDynamicKeyValueTioProps> = ({
                 </div>
                 {
                   // Display each key-value pair in the row
-                  Object.entries(item).map(([key, value]) => (
+                  Object.entries(item)?.map(([key, value]) => (
                     <tr key={`${key}-${rowIndex}`} className="border-t">
                       <td className="px-4 py-2 text-gray-600 text-md">{key}</td>
                       <td className="px-4 py-2 text-sm font-bold text-gray-600">

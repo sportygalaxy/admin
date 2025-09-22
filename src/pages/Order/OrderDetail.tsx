@@ -39,8 +39,9 @@ const OrderDetail: FC<OrderDetailProps> = () => {
   const offlineUserAddress = orderInfoResponse?.offlineUser?.address || "N/A";
   const offlineUserPhone = orderInfoResponse?.offlineUser?.phone || "N/A";
 
-  const variant = orderInfoResponse?.variant || {};
-  // const amountToPay = orderInfoResponse?.amountToPay || 0;
+  const variant = orderInfoResponse?.variant || null;
+  const total = orderInfoResponse?.total || 0;
+  const amountToPay = orderInfoResponse?.amountToPay || 0;
   const status = orderInfoResponse?.status || "";
   const paymentOption = orderInfoResponse?.paymentOption || "";
 
@@ -109,10 +110,13 @@ const OrderDetail: FC<OrderDetailProps> = () => {
         >
           <div className="mt-10 space-y-10">
             <OrderProductList items={orderInfoResponse?.items} />
-            <ProductDynamicKeyValueTio
-              title="Variant"
-              data={[orderInfoResponse?.variant]}
-            />
+
+            {variant && (
+              <ProductDynamicKeyValueTio
+                title="Variant"
+                data={[orderInfoResponse?.variant]}
+              />
+            )}
             <div className="grid grid-cols-1 gap-0 md:grid-cols-2">
               <div className="mt-8">
                 <p className="font-bold text-black font-jost text-mobile-2xl md:text-2xl">
@@ -135,38 +139,76 @@ const OrderDetail: FC<OrderDetailProps> = () => {
                   Payments
                 </p>
 
-                <div className="mt-2 space-y-6">
-                  <div className="space-y-3">
-                    <p className="flex items-center gap-2 font-light leading-normal tracking-wide text-black font-jost text-mobile-xl md:text-xl">
-                      Option: {paymentOption}
-                    </p>
+                {variant ? (
+                  <div className="mt-2 space-y-6">
+                    <div className="space-y-3">
+                      <p className="flex items-center gap-2 font-light leading-normal tracking-wide text-black font-jost text-mobile-xl md:text-xl">
+                        Option: {paymentOption}
+                      </p>
 
-                    <p className="flex items-center gap-2 font-light leading-normal tracking-wide text-black font-jost text-mobile-xl md:text-xl">
-                      Total Cost: {formatCurrency(variant?.prices || 0)}
-                    </p>
+                      <p className="flex items-center gap-2 font-light leading-normal tracking-wide text-black font-jost text-mobile-xl md:text-xl">
+                        Total Cost: {formatCurrency(variant?.prices || 0)}
+                      </p>
 
-                    {paymentOption === "FULL" ? (
-                      <>
-                        <p className="flex items-center gap-2 font-light leading-normal tracking-wide text-black font-jost text-mobile-xl md:text-xl">
-                          Amount Paid: {formatCurrency(variant?.prices || 0)}
-                        </p>
-                      </>
-                    ) : (
-                      <>
-                        <p className="flex items-center gap-2 font-light leading-normal tracking-wide text-black font-jost text-mobile-xl md:text-xl">
-                          Amount Paid:{" "}
-                          {formatCurrency(variant?.amountToPay) || 0}
-                        </p>
-                      </>
-                    )}
+                      {paymentOption === "FULL" ? (
+                        <>
+                          <p className="flex items-center gap-2 font-light leading-normal tracking-wide text-black font-jost text-mobile-xl md:text-xl">
+                            Amount Paid: {formatCurrency(variant?.prices || 0)}
+                          </p>
+                        </>
+                      ) : (
+                        <>
+                          <p className="flex items-center gap-2 font-light leading-normal tracking-wide text-black font-jost text-mobile-xl md:text-xl">
+                            Amount Paid:{" "}
+                            {formatCurrency(variant?.amountToPay) || 0}
+                          </p>
+                        </>
+                      )}
 
-                    <p className="flex items-center gap-2 font-light leading-normal tracking-wide text-black font-jost text-mobile-xl md:text-xl">
-                      Amount Remaining:{" "}
-                      {paymentOption === "FULL" ? "NIL" :formatCurrency(variant?.prices - variant?.amountToPay) ||
-                        0}
-                    </p>
+                      <p className="flex items-center gap-2 font-light leading-normal tracking-wide text-black font-jost text-mobile-xl md:text-xl">
+                        Amount Remaining:{" "}
+                        {paymentOption === "FULL"
+                          ? "NIL"
+                          : formatCurrency(
+                              variant?.prices - variant?.amountToPay
+                            ) || 0}
+                      </p>
+                    </div>
                   </div>
-                </div>
+                ) : (
+                  <div className="mt-2 space-y-6">
+                    <div className="space-y-3">
+                      <p className="flex items-center gap-2 font-light leading-normal tracking-wide text-black font-jost text-mobile-xl md:text-xl">
+                        Option: {paymentOption}
+                      </p>
+
+                      <p className="flex items-center gap-2 font-light leading-normal tracking-wide text-black font-jost text-mobile-xl md:text-xl">
+                        Total Cost: {formatCurrency(total || 0)}
+                      </p>
+
+                      {paymentOption === "FULL" ? (
+                        <>
+                          <p className="flex items-center gap-2 font-light leading-normal tracking-wide text-black font-jost text-mobile-xl md:text-xl">
+                            Amount Paid: {formatCurrency(total || 0)}
+                          </p>
+                        </>
+                      ) : (
+                        <>
+                          <p className="flex items-center gap-2 font-light leading-normal tracking-wide text-black font-jost text-mobile-xl md:text-xl">
+                            Amount Paid:
+                            {paymentOption === "FULL"
+                              ? "NIL"
+                              : formatCurrency(total - amountToPay) || 0}
+                          </p>
+                        </>
+                      )}
+
+                      <p className="flex items-center gap-2 font-light leading-normal tracking-wide text-black font-jost text-mobile-xl md:text-xl">
+                        Amount Remaining: {formatCurrency(amountToPay) || 0}
+                      </p>
+                    </div>
+                  </div>
+                )}
               </div>
 
               <div className="mt-8">
