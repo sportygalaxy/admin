@@ -67,9 +67,6 @@ const ProductDetail: FC<ProductDetailProps> = () => {
     getProductInfoQuery.isLoading
   );
 
-  
-  console.log("cccc -----", cleanAndGroupVariantsV2(variants));
-
   return (
     <>
       <WatermarkOverlay isVisible={isDeleted} text="Product Deactivated" />

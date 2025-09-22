@@ -40,7 +40,7 @@ const OrderDetail: FC<OrderDetailProps> = () => {
   const offlineUserPhone = orderInfoResponse?.offlineUser?.phone || "N/A";
 
   const variant = orderInfoResponse?.variant || {};
-  const amountToPay = orderInfoResponse?.amountToPay || 0;
+  // const amountToPay = orderInfoResponse?.amountToPay || 0;
   const status = orderInfoResponse?.status || "";
   const paymentOption = orderInfoResponse?.paymentOption || "";
 

@@ -251,7 +251,6 @@ const ProductUpdate: FC<ProductUpdateProps> = () => {
           fields.forEach((field) => {
             const value = values[field];
 
-            console.log("value", value);
             if (value === "colorIds" || value === "sizeIds")
               return (payload[field] = value);
             if (

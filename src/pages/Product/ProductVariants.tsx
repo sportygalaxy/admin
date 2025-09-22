@@ -5,7 +5,6 @@ import IconButton from "@mui/material/IconButton";
 import Button from "@mui/material/Button";
 import { Trash04 } from "@untitled-ui/icons-react";
 import { MenuItem, Select, SelectChangeEvent, Typography } from "@mui/material";
-import { removeIdAndMergeArrays } from "./utils/remove-id-and-merge-array";
 import { ApiColorStoreSlice } from "@/api/ApiColorStoreSlice";
 import { ApiSizeStoreSlice } from "@/api/ApiSizeStoreSlice";
 import { cleanAndGroupVariants } from "./utils/clean-array";
@@ -19,12 +18,6 @@ const ProductVariants: FC<ProductVarientsProps> = ({
   formik,
   initialVariants = [],
 }) => {
-  console.log("initialVariants", initialVariants);
-  console.log(
-    "initialVariants - clean",
-    cleanAndGroupVariants(initialVariants)
-  );
-
   const cleanedArr = cleanAndGroupVariants(initialVariants);
 
   // Transform initial data into the expected format on mount
@@ -47,7 +40,7 @@ const ProductVariants: FC<ProductVarientsProps> = ({
     isLoading: colorIsLoading,
     isError: colorIsError,
     refetch: colorRefetch,
-    error: colorError,
+    // error: colorError,
   } = ApiColorStoreSlice.useGetColorsQuery();
 
   const {
@@ -55,7 +48,7 @@ const ProductVariants: FC<ProductVarientsProps> = ({
     isLoading: sizeIsLoading,
     isError: sizeIsError,
     refetch: sizeRefetch,
-    error: sizeError,
+    // error: sizeError,
   } = ApiSizeStoreSlice.useGetSizesQuery();
 
   // Function to add a new field to the variants array with a unique id
@@ -152,17 +145,6 @@ const ProductVariants: FC<ProductVarientsProps> = ({
   useEffect(() => {
     sizeRefetch();
   }, [sizeRefetch]);
-
-  console.log("FORMIK", formik.values, colorError, sizeError);
-  console.log(
-    "FORMIK - FLat",
-    removeIdAndMergeArrays(
-      formik.values.variantsColor,
-      formik.values.variantsSize,
-      formik.values.variantsDimension,
-      formik.values.variantsWeight
-    )
-  );
 
   return (
     <div className="flex flex-col items-center justify-center">
