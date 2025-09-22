@@ -25,9 +25,11 @@ import { exportToCSV } from "@/helpers/exportToCSV";
 import { PAGINATION_DEFAULT } from "@/constants/AppConstants";
 import PopupState, { bindPopover, bindTrigger } from "material-ui-popup-state";
 import OrderStatusAssignModal from "./OrderStatusAssignModal";
+import { useQueryParam } from "@/hooks/useQueryParam";
 
 const OrderTable = () => {
   const query = useQuery();
+  const { get } = useQueryParam();
   const { showErrorSnackbar } = useExtendedSnackbar();
   const navigate = useNavigate();
 
@@ -43,7 +45,7 @@ const OrderTable = () => {
     { accessorKey: "orderProductName", header: "Name" },
     { accessorKey: "orderCustomerName", header: "User" },
     { accessorKey: "id", header: "Order ID" },
-    { accessorKey: "total", header: "Total Price" },
+    { accessorKey: "total", header: "Total Paid" },
     { accessorKey: "orderStatus", header: "Status" },
     { accessorKey: "paymentOption", header: "Payment Option" },
     { accessorKey: "count", header: "Total no of Item in Cart" },
@@ -61,7 +63,7 @@ const OrderTable = () => {
             {(popupState: any) => (
               <>
                 <div
-                  className="cursor-pointer p-2"
+                  className="p-2 cursor-pointer"
                   {...bindTrigger(popupState)}
                 >
                   <DotsVertical />
@@ -82,12 +84,12 @@ const OrderTable = () => {
                       to={`${generatePath(routeEnum.ORDER_DETAILS, {
                         id: row.original.id,
                       })}`}
-                      className="flex items-center justify-start gap-2 py-3 px-4 hover:bg-slate-50 cursor-pointer"
+                      className="flex items-center justify-start gap-2 px-4 py-3 cursor-pointer hover:bg-slate-50"
                     >
                       <ImageUser width={20} height={20} />
                       <Typography
                         color="grey.700"
-                        className="text-xs font-inter font-medium capitalize"
+                        className="text-xs font-medium capitalize font-inter"
                       >
                         View order
                       </Typography>
@@ -115,7 +117,7 @@ const OrderTable = () => {
   const renderHeader = (headerGroup: HeaderGroup<User>) => (
     <>
       {headerGroup.headers.map((header) => (
-        <th key={header.id} className="py-3 font-medium p-6">
+        <th key={header.id} className="p-6 py-3 font-medium">
           <div
             {...{
               onClick: header.column.getToggleSortingHandler(),
@@ -147,7 +149,7 @@ const OrderTable = () => {
             <td
               key={cell.id}
               onClick={() => handleGotoOrder(cell.row.original.id)}
-              className="py-4 p-6"
+              className="p-6 py-4"
             >
               <TableText
                 value={cell.row.original}
@@ -163,7 +165,7 @@ const OrderTable = () => {
             <td
               key={cell.id}
               onClick={() => handleGotoOrder(cell.row.original.id)}
-              className="py-4 p-6"
+              className="p-6 py-4"
             >
               <TableText
                 value={cell.row.original}
@@ -179,7 +181,7 @@ const OrderTable = () => {
             <td
               key={cell.id}
               onClick={() => handleGotoOrder(cell.row.original.id)}
-              className="py-4 p-6"
+              className="p-6 py-4"
             >
               <TableText
                 value={cell.row.original}
@@ -195,7 +197,7 @@ const OrderTable = () => {
             <td
               key={cell.id}
               onClick={() => handleGotoOrder(cell.row.original.id)}
-              className="py-4 p-6"
+              className="p-6 py-4"
             >
               <TableText
                 value={cell.row.original}
@@ -211,7 +213,7 @@ const OrderTable = () => {
             <td
               key={cell.id}
               onClick={() => handleGotoOrder(cell.row.original.id)}
-              className="py-4 p-6"
+              className="p-6 py-4"
             >
               <TableText
                 value={cell.row.original}
@@ -227,7 +229,7 @@ const OrderTable = () => {
             <td
               key={cell.id}
               onClick={() => handleGotoOrder(cell.row.original.id)}
-              className="py-4 p-6"
+              className="p-6 py-4"
             >
               <TableText
                 value={cell.row.original}
@@ -243,7 +245,7 @@ const OrderTable = () => {
             <td
               key={cell.id}
               onClick={() => handleGotoOrder(cell.row.original.id)}
-              className="py-4 p-6"
+              className="p-6 py-4"
             >
               <TableText
                 value={cell.row.original}
@@ -259,7 +261,7 @@ const OrderTable = () => {
             <td
               key={cell.id}
               onClick={() => handleGotoOrder(cell.row.original.id)}
-              className="py-4 p-6"
+              className="p-6 py-4"
             >
               <TableText
                 value={cell.row.original}
@@ -275,7 +277,7 @@ const OrderTable = () => {
             <td
               key={cell.id}
               onClick={() => handleGotoOrder(cell.row.original.id)}
-              className="py-4 p-6"
+              className="p-6 py-4"
             >
               <TableText
                 value={cell.row.original}
@@ -291,7 +293,7 @@ const OrderTable = () => {
             <td
               key={cell.id}
               onClick={() => handleGotoOrder(cell.row.original.id)}
-              className="py-4 p-6"
+              className="p-6 py-4"
             >
               <TableText
                 value={cell.row.original}
@@ -307,7 +309,7 @@ const OrderTable = () => {
             <td
               key={cell.id}
               onClick={() => handleGotoOrder(cell.row.original.id)}
-              className="py-4 p-6"
+              className="p-6 py-4"
             >
               <TableText
                 value={cell.row.original}
@@ -341,6 +343,7 @@ const OrderTable = () => {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [globalFilter, setGlobalFilter] = useState("");
   const orderStatus = query.get("tab") || "";
+  const pageIndexFromUrl = get("page") || pageIndex;
 
   // State for filters
   const [isDeleted, setIsDeleted] = useState<boolean | undefined>(false);
@@ -356,7 +359,7 @@ const OrderTable = () => {
     refetch,
     error,
   } = ApiOrderStoreSlice.useGetOrdersQuery({
-    pageIndex,
+    pageIndex: Number(pageIndexFromUrl) || pageIndex,
     pageSize,
     sorting,
     globalFilter,
@@ -390,7 +393,7 @@ const OrderTable = () => {
     sorting: SortingState,
     globalFilter: string
   ) => {
-    setPageIndex(pageIndex);
+    setPageIndex(Number(pageIndexFromUrl) || pageIndex);
     setPageSize(pageSize);
     setSorting(sorting);
     setGlobalFilter(globalFilter);
@@ -400,7 +403,15 @@ const OrderTable = () => {
 
   useEffect(() => {
     fetchData(pageIndex, pageSize, sorting, globalFilter);
-  }, [pageIndex, pageSize, sorting, globalFilter, isDeleted, isRequestDelete]);
+  }, [
+    pageIndex,
+    pageSize,
+    sorting,
+    globalFilter,
+    isDeleted,
+    isRequestDelete,
+    pageIndexFromUrl,
+  ]);
 
   if (isError) {
     showErrorSnackbar(error?.message || "Error occured");
@@ -429,7 +440,7 @@ const OrderTable = () => {
           <Button
             variant="outlined"
             startIcon={<Share01 width={20} height={20} />}
-            className="capitalize font-bold font-inter flex items-center justify-center"
+            className="flex items-center justify-center font-bold capitalize font-inter"
             size="medium"
             onClick={handleExportCSV}
           >
@@ -468,7 +479,7 @@ const OrderTable = () => {
             <Button
               variant="outlined"
               startIcon={<Share01 width={20} height={20} />}
-              className="capitalize font-bold font-inter flex items-center justify-center"
+              className="flex items-center justify-center font-bold capitalize font-inter"
               size="medium"
               onClick={handleExportCSV}
             >

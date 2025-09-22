@@ -14,6 +14,8 @@ import WatermarkOverlay from "@/common/WatermarkOverlay";
 import LoadingContent from "@/common/LoadingContent/LoadingContent";
 import { objectToArray } from "@/utils/ObjectUtils";
 import ProductReactivateButton from "./components/ProductReactivateButton";
+import { cleanAndGroupVariantsV2 } from "./utils/clean-array";
+import ProductDynamicKeyValueTio from "./components/ProductDynamicKeyValueTio";
 
 interface ProductDetailProps {}
 const ProductDetail: FC<ProductDetailProps> = () => {
@@ -49,6 +51,7 @@ const ProductDetail: FC<ProductDetailProps> = () => {
   const keyattribute = productInfoResponse?.keyattribute || [
     { key: "", value: "" },
   ];
+  const variants = cleanAndGroupVariantsV2(productInfoResponse?.variants) || [];
 
   const handleGotoUpdateProduct = () => {
     const route = generatePath(routeEnum.PRODUCTS_UPDATE, {
@@ -64,6 +67,9 @@ const ProductDetail: FC<ProductDetailProps> = () => {
     getProductInfoQuery.isLoading
   );
 
+  
+  console.log("cccc -----", cleanAndGroupVariantsV2(variants));
+
   return (
     <>
       <WatermarkOverlay isVisible={isDeleted} text="Product Deactivated" />
@@ -78,7 +84,7 @@ const ProductDetail: FC<ProductDetailProps> = () => {
         <div className="flex items-center justify-between mt-7">
           <Typography
             color="grey.900"
-            className="font-bold text-4xl font-crimson"
+            className="text-4xl font-bold font-crimson"
           >
             Product Details - ({modelNumber})
           </Typography>
@@ -103,22 +109,22 @@ const ProductDetail: FC<ProductDetailProps> = () => {
             />
 
             <div className="space-y-4">
-              <p className="capitalize font-jost text-black text-mobile-2xl md:text-2xl font-bold">
+              <p className="font-bold text-black capitalize font-jost text-mobile-2xl md:text-2xl">
                 {name || ""}
               </p>
-              <p className="font-jost text-secondary text-mobile-xl md:text-xl font-light leading-normal tracking-wide">
+              <p className="font-light leading-normal tracking-wide font-jost text-secondary text-mobile-xl md:text-xl">
                 {description || ""}
               </p>
 
               <div className="mt-8">
-                <p className="font-jost text-black text-mobile-2xl md:text-2xl font-bold">
+                <p className="font-bold text-black font-jost text-mobile-2xl md:text-2xl">
                   Groups
                 </p>
 
                 <div className="mt-2 space-y-6">
                   {modelNumber && (
                     <div className="space-y-3">
-                      <p className="font-jost text-black text-mobile-xl md:text-xl font-light leading-normal tracking-wide">
+                      <p className="font-light leading-normal tracking-wide text-black font-jost text-mobile-xl md:text-xl">
                         Model Number:{" "}
                         <span className="font-semibold">{modelNumber}</span>
                       </p>
@@ -128,7 +134,7 @@ const ProductDetail: FC<ProductDetailProps> = () => {
                 <div className="mt-2 space-y-6">
                   {category && (
                     <div className="space-y-3">
-                      <p className="font-jost text-black text-mobile-xl md:text-xl font-light leading-normal tracking-wide">
+                      <p className="font-light leading-normal tracking-wide text-black font-jost text-mobile-xl md:text-xl">
                         Category: {category}
                       </p>
                     </div>
@@ -137,7 +143,7 @@ const ProductDetail: FC<ProductDetailProps> = () => {
                 <div className="mt-2 space-y-6">
                   {subcategory && (
                     <div className="space-y-3">
-                      <p className="font-jost text-black text-mobile-xl md:text-xl font-light leading-normal tracking-wide">
+                      <p className="font-light leading-normal tracking-wide text-black font-jost text-mobile-xl md:text-xl">
                         Subcategory: {subcategory}
                       </p>
                     </div>
@@ -146,22 +152,22 @@ const ProductDetail: FC<ProductDetailProps> = () => {
               </div>
 
               <div className="mt-8">
-                <p className="font-jost text-black text-mobile-2xl md:text-2xl font-bold">
+                <p className="font-bold text-black font-jost text-mobile-2xl md:text-2xl">
                   Variations
                 </p>
 
                 <div className="mt-2 space-y-6">
                   {colors && (
                     <div className="space-y-3">
-                      <p className="font-jost text-black text-mobile-xl md:text-xl font-light leading-normal tracking-wide">
+                      <p className="font-light leading-normal tracking-wide text-black font-jost text-mobile-xl md:text-xl">
                         Total options: {colors?.length} colour
                         {colors?.length >= 2 ? "s" : ""}
                       </p>
-                      <div className="flex items-center flex-wrap gap-3">
+                      <div className="flex flex-wrap items-center gap-3">
                         {colors.map((color: any, index: number) => (
                           <span
                             key={index}
-                            className="h-fit w-fit rounded-full"
+                            className="rounded-full h-fit w-fit"
                           >
                             <Button
                               type="button"
@@ -180,11 +186,11 @@ const ProductDetail: FC<ProductDetailProps> = () => {
 
                   {sizes && (
                     <div className="space-y-3">
-                      <p className="font-jost text-black text-mobile-xl md:text-xl font-light leading-normal tracking-wide">
+                      <p className="font-light leading-normal tracking-wide text-black font-jost text-mobile-xl md:text-xl">
                         Total options: {sizes?.length} size
                         {sizes?.length >= 2 ? "s" : ""}
                       </p>
-                      <div className="flex items-center flex-wrap gap-3">
+                      <div className="flex flex-wrap items-center gap-3">
                         {sizes.map((size: any, index: number) => (
                           <Button
                             key={index}
@@ -207,7 +213,7 @@ const ProductDetail: FC<ProductDetailProps> = () => {
               <div className="mt-8">
                 <p className="font-medium text-mobile-5xl md:text-4xl">
                   {formatCurrency(price || 0)}
-                  <span className="text-destructive text-sm pl-2">
+                  <span className="pl-2 text-sm text-destructive">
                     *{stock} unit{stock > 1 ? "s" : ""} left
                   </span>
                 </p>
@@ -224,6 +230,8 @@ const ProductDetail: FC<ProductDetailProps> = () => {
               data={keyattribute}
             />
 
+            <ProductDynamicKeyValueTio title="Variants" data={variants} />
+
             <div className="mt-10 space-x-3">
               {isDeleted ? (
                 <ProductReactivateButton disable={!isDisabled} productId={id} />
@@ -233,7 +241,7 @@ const ProductDetail: FC<ProductDetailProps> = () => {
                     disabled={!isDisabled}
                     onClick={handleGotoUpdateProduct}
                     startIcon={<Edit01 width={20} height={20} />}
-                    className="capitalize font-semibold text-base font-inter md:px-10"
+                    className="text-base font-semibold capitalize font-inter md:px-10"
                     variant="ghost"
                     size="medium"
                   >

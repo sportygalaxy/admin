@@ -19,7 +19,7 @@ const TableText: FC<TableTextProps> = ({ type, value }) => {
         {value?.isVerified ? (
           <Chip
             color="success"
-            className="text-xs font-inter font-medium"
+            className="text-xs font-medium font-inter"
             icon={<span className="w-2 h-2 rounded-full bg-[#1BA879]"></span>}
             label="Active"
           />
@@ -40,7 +40,7 @@ const TableText: FC<TableTextProps> = ({ type, value }) => {
         {value?.isDeleted ? (
           <Chip
             color="success"
-            className="text-xs font-inter font-medium"
+            className="text-xs font-medium font-inter"
             icon={<span className="w-2 h-2 rounded-full bg-[#1BA879]"></span>}
             label="True"
           />
@@ -67,7 +67,7 @@ const TableText: FC<TableTextProps> = ({ type, value }) => {
         ) : (
           <Chip
             color="success"
-            className="text-xs font-inter font-medium"
+            className="text-xs font-medium font-inter"
             icon={<span className="w-2 h-2 rounded-full bg-[#1BA879]"></span>}
             label="Online"
           />
@@ -100,7 +100,7 @@ const TableText: FC<TableTextProps> = ({ type, value }) => {
 
   if (type === TABLE_ROW_TYPE.PRICE) {
     return (
-      <Typography color="grey.900" className="font-inter font-medium text-sm">
+      <Typography color="grey.900" className="text-sm font-medium font-inter">
         {formatCurrency(value?.price || 0)}
       </Typography>
     );
@@ -108,7 +108,7 @@ const TableText: FC<TableTextProps> = ({ type, value }) => {
 
   if (type === TABLE_ROW_TYPE.STOCK) {
     return (
-      <Typography color="grey.900" className="font-inter font-medium text-sm">
+      <Typography color="grey.900" className="text-sm font-medium font-inter">
         {value?.stock}
       </Typography>
     );
@@ -116,7 +116,7 @@ const TableText: FC<TableTextProps> = ({ type, value }) => {
 
   if (type === TABLE_ROW_TYPE.CATEGORY) {
     return (
-      <Typography color="grey.900" className="font-inter font-medium text-sm">
+      <Typography color="grey.900" className="text-sm font-medium font-inter">
         {value?.category?.name}
       </Typography>
     );
@@ -124,7 +124,7 @@ const TableText: FC<TableTextProps> = ({ type, value }) => {
 
   if (type === TABLE_ROW_TYPE.SUB_CATEGORY) {
     return (
-      <Typography color="grey.900" className="font-inter font-medium text-sm">
+      <Typography color="grey.900" className="text-sm font-medium font-inter">
         {value?.subcategory?.name}
       </Typography>
     );
@@ -136,7 +136,7 @@ const TableText: FC<TableTextProps> = ({ type, value }) => {
         <Avatar
           src={value?.displayImage}
           alt={value?.name}
-          className="rounded-md w-20 h-20"
+          className="w-20 h-20 rounded-md"
         />
         <div>
           <Typography
@@ -149,7 +149,7 @@ const TableText: FC<TableTextProps> = ({ type, value }) => {
             <Calendar color="#027A48" width={12} height={12} />
             <Typography
               color="grey.600"
-              className="font-inter font-thin text-xs capitalize"
+              className="text-xs font-thin capitalize font-inter"
             >
               ({transformDate(value?.createdAt)})
             </Typography>
@@ -173,7 +173,7 @@ const TableText: FC<TableTextProps> = ({ type, value }) => {
             <Calendar color="#027A48" width={12} height={12} />
             <Typography
               color="grey.600"
-              className="font-inter font-thin text-xs capitalize"
+              className="text-xs font-thin capitalize font-inter"
             >
               ({transformDate(value?.createdAt)})
             </Typography>
@@ -189,7 +189,7 @@ const TableText: FC<TableTextProps> = ({ type, value }) => {
         <Avatar
           src={value?.avatar}
           alt={value?.firstName}
-          className="rounded-md w-20 h-20"
+          className="w-20 h-20 rounded-md"
         />
         <div>
           <Typography
@@ -202,7 +202,7 @@ const TableText: FC<TableTextProps> = ({ type, value }) => {
             <Calendar color="#027A48" width={18} height={18} />
             <Typography
               color="grey.600"
-              className="font-inter font-thin text-xs capitalize"
+              className="text-xs font-thin capitalize font-inter"
             >
               ({transformDate(value?.createdAt)})
             </Typography>
@@ -226,7 +226,7 @@ const TableText: FC<TableTextProps> = ({ type, value }) => {
             {index < value?.items?.length - 1 && (
               <Typography
                 color="error"
-                className="font-crimson font-bold text-lg"
+                className="text-lg font-bold font-crimson"
               >
                 ,
               </Typography>
@@ -281,7 +281,7 @@ const TableText: FC<TableTextProps> = ({ type, value }) => {
               <Avatar
                 src={product?.product?.displayImage}
                 alt={product?.product.name}
-                className="rounded-md w-10 h-10"
+                className="w-10 h-10 rounded-md"
                 key={`${product?.product?.id}${index}`}
               />
             );
@@ -293,8 +293,8 @@ const TableText: FC<TableTextProps> = ({ type, value }) => {
 
   if (type === TABLE_ROW_TYPE.ORDER_PRICE) {
     return (
-      <Typography color="grey.900" className="font-inter font-medium text-sm">
-        {formatCurrency(value?.total || 0)}
+      <Typography color="grey.900" className="text-sm font-medium font-inter">
+        {formatCurrency(value?.variant?.prices || 0)}
       </Typography>
     );
   }
@@ -335,7 +335,7 @@ const TableText: FC<TableTextProps> = ({ type, value }) => {
 
   if (type === TABLE_ROW_TYPE.TRANSACTION_AMOUNT) {
     return (
-      <Typography color="grey.900" className="font-inter font-medium text-sm">
+      <Typography color="grey.900" className="text-sm font-medium font-inter">
         {formatCurrency(value?.amount || 0)}
       </Typography>
     );
@@ -345,7 +345,7 @@ const TableText: FC<TableTextProps> = ({ type, value }) => {
     return (
       <Typography
         color="grey.900"
-        className="font-inter font-medium capitalize text-sm"
+        className="text-sm font-medium capitalize font-inter"
       >
         {value?.paymentGateway?.name}
       </Typography>

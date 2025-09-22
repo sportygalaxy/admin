@@ -8,12 +8,40 @@ import { MenuItem, Select, SelectChangeEvent, Typography } from "@mui/material";
 import { removeIdAndMergeArrays } from "./utils/remove-id-and-merge-array";
 import { ApiColorStoreSlice } from "@/api/ApiColorStoreSlice";
 import { ApiSizeStoreSlice } from "@/api/ApiSizeStoreSlice";
+import { cleanAndGroupVariants } from "./utils/clean-array";
 
 interface ProductVarientsProps {
   formik: any;
+  initialVariants?: Array<{ title: string; details: string }>; // Adjust the incoming data structure
 }
 
-const ProductVariants: FC<ProductVarientsProps> = ({ formik }) => {
+const ProductVariants: FC<ProductVarientsProps> = ({
+  formik,
+  initialVariants = [],
+}) => {
+  console.log("initialVariants", initialVariants);
+  console.log(
+    "initialVariants - clean",
+    cleanAndGroupVariants(initialVariants)
+  );
+
+  const cleanedArr = cleanAndGroupVariants(initialVariants);
+
+  // Transform initial data into the expected format on mount
+  useEffect(() => {
+    if (initialVariants.length > 0) {
+      const colorVariants = cleanedArr.variantsColor;
+      const sizeVariants = cleanedArr.variantsSize;
+      const weightVariants = cleanedArr.variantsWeight;
+      const dimensionVariants = cleanedArr.variantsDimension;
+
+      formik.setFieldValue("variantsColor", colorVariants);
+      formik.setFieldValue("variantsSize", sizeVariants);
+      formik.setFieldValue("variantsWeight", weightVariants);
+      formik.setFieldValue("variantsDimension", dimensionVariants);
+    }
+  }, [initialVariants]);
+
   const {
     data: colorsResponse,
     isLoading: colorIsLoading,
@@ -151,8 +179,8 @@ const ProductVariants: FC<ProductVarientsProps> = ({ formik }) => {
           </Typography>
 
           {formik.values.variantsColor
-            .filter((variant) => variant.colorId)
-            .map((variant, index) => (
+            ?.filter((variant) => variant.colorId)
+            ?.map((variant, index) => (
               <div key={variant.id} className="flex mb-4 space-x-2">
                 <div>
                   <Typography
@@ -265,8 +293,8 @@ const ProductVariants: FC<ProductVarientsProps> = ({ formik }) => {
           </Typography>
 
           {formik.values.variantsSize
-            .filter((variant) => variant.sizeId)
-            .map((variant, index) => (
+            ?.filter((variant) => variant.sizeId)
+            ?.map((variant, index) => (
               <div key={variant.id} className="flex mb-4 space-x-2">
                 <div>
                   <Typography
@@ -377,8 +405,8 @@ const ProductVariants: FC<ProductVarientsProps> = ({ formik }) => {
             Add Dimension Variants
           </Typography>
           {formik.values.variantsDimension
-            .filter((variant) => variant.dimension)
-            .map((variant, index) => (
+            ?.filter((variant) => variant.dimension)
+            ?.map((variant, index) => (
               <div key={variant.id} className="flex mb-4 space-x-2">
                 <div>
                   <Typography
@@ -476,8 +504,8 @@ const ProductVariants: FC<ProductVarientsProps> = ({ formik }) => {
             Add Weight Variants
           </Typography>
           {formik.values.variantsWeight
-            .filter((variant: any) => variant.weight)
-            .map((variant: any, index: any) => (
+            ?.filter((variant: any) => variant.weight)
+            ?.map((variant: any, index: any) => (
               <div key={variant.id} className="flex mb-4 space-x-2">
                 <div>
                   <Typography

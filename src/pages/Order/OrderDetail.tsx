@@ -14,6 +14,7 @@ import { ORDER_STATUS } from "@/constants/enums";
 import OrderDeleteButton from "./OrderDeleteButton";
 import LoadingContent from "@/common/LoadingContent/LoadingContent";
 import { objectToArray } from "@/utils/ObjectUtils";
+import ProductDynamicKeyValueTio from "../Product/components/ProductDynamicKeyValueTio";
 
 interface OrderDetailProps {}
 const OrderDetail: FC<OrderDetailProps> = () => {
@@ -38,7 +39,7 @@ const OrderDetail: FC<OrderDetailProps> = () => {
   const offlineUserAddress = orderInfoResponse?.offlineUser?.address || "N/A";
   const offlineUserPhone = orderInfoResponse?.offlineUser?.phone || "N/A";
 
-  const total = orderInfoResponse?.total || 0;
+  const variant = orderInfoResponse?.variant || {};
   const amountToPay = orderInfoResponse?.amountToPay || 0;
   const status = orderInfoResponse?.status || "";
   const paymentOption = orderInfoResponse?.paymentOption || "";
@@ -62,7 +63,7 @@ const OrderDetail: FC<OrderDetailProps> = () => {
         {isOfflineUser ? (
           <Chip
             color="error"
-            className="text-xs font-inter font-medium"
+            className="text-xs font-medium font-inter"
             icon={<span className="w-2 h-2 rounded-full bg-[#F04438]"></span>}
             label="Offline Customer"
           />
@@ -91,7 +92,7 @@ const OrderDetail: FC<OrderDetailProps> = () => {
         <div className="flex items-center justify-between mt-7">
           <Typography
             color="grey.900"
-            className="font-bold text-4xl font-crimson"
+            className="text-4xl font-bold font-crimson"
           >
             Order Details
           </Typography>
@@ -108,17 +109,20 @@ const OrderDetail: FC<OrderDetailProps> = () => {
         >
           <div className="mt-10 space-y-10">
             <OrderProductList items={orderInfoResponse?.items} />
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-0">
+            <ProductDynamicKeyValueTio
+              title="Variant"
+              data={[orderInfoResponse?.variant]}
+            />
+            <div className="grid grid-cols-1 gap-0 md:grid-cols-2">
               <div className="mt-8">
-                <p className="font-jost text-black text-mobile-2xl md:text-2xl font-bold">
+                <p className="font-bold text-black font-jost text-mobile-2xl md:text-2xl">
                   Status
                 </p>
 
                 <div className="mt-2 space-y-6">
                   {status && (
                     <div className="space-y-3">
-                      <p className="flex items-center gap-2 font-jost text-black text-mobile-xl md:text-xl font-light leading-normal tracking-wide">
+                      <p className="flex items-center gap-2 font-light leading-normal tracking-wide text-black font-jost text-mobile-xl md:text-xl">
                         Status: <OrderStatus status={status} />
                       </p>
                     </div>
@@ -127,60 +131,62 @@ const OrderDetail: FC<OrderDetailProps> = () => {
               </div>
 
               <div className="mt-8">
-                <p className="font-jost text-black text-mobile-2xl md:text-2xl font-bold">
+                <p className="font-bold text-black font-jost text-mobile-2xl md:text-2xl">
                   Payments
                 </p>
 
                 <div className="mt-2 space-y-6">
                   <div className="space-y-3">
-                    <p className="flex items-center gap-2 font-jost text-black text-mobile-xl md:text-xl font-light leading-normal tracking-wide">
+                    <p className="flex items-center gap-2 font-light leading-normal tracking-wide text-black font-jost text-mobile-xl md:text-xl">
                       Option: {paymentOption}
                     </p>
 
-                    <p className="flex items-center gap-2 font-jost text-black text-mobile-xl md:text-xl font-light leading-normal tracking-wide">
-                      Total Cost: {formatCurrency(total || 0)}
+                    <p className="flex items-center gap-2 font-light leading-normal tracking-wide text-black font-jost text-mobile-xl md:text-xl">
+                      Total Cost: {formatCurrency(variant?.prices || 0)}
                     </p>
 
                     {paymentOption === "FULL" ? (
                       <>
-                        <p className="flex items-center gap-2 font-jost text-black text-mobile-xl md:text-xl font-light leading-normal tracking-wide">
-                          Amount Paid: {formatCurrency(total || 0)}
+                        <p className="flex items-center gap-2 font-light leading-normal tracking-wide text-black font-jost text-mobile-xl md:text-xl">
+                          Amount Paid: {formatCurrency(variant?.prices || 0)}
                         </p>
                       </>
                     ) : (
                       <>
-                        <p className="flex items-center gap-2 font-jost text-black text-mobile-xl md:text-xl font-light leading-normal tracking-wide">
+                        <p className="flex items-center gap-2 font-light leading-normal tracking-wide text-black font-jost text-mobile-xl md:text-xl">
                           Amount Paid:{" "}
-                          {formatCurrency(total - amountToPay) || 0}
+                          {formatCurrency(variant?.amountToPay) || 0}
                         </p>
                       </>
                     )}
 
-                    <p className="flex items-center gap-2 font-jost text-black text-mobile-xl md:text-xl font-light leading-normal tracking-wide">
-                      Amount Remaining: {formatCurrency(amountToPay) || 0}
+                    <p className="flex items-center gap-2 font-light leading-normal tracking-wide text-black font-jost text-mobile-xl md:text-xl">
+                      Amount Remaining:{" "}
+                      {paymentOption === "FULL" ? "NIL" :formatCurrency(variant?.prices - variant?.amountToPay) ||
+                        0}
                     </p>
                   </div>
                 </div>
               </div>
 
               <div className="mt-8">
-                <p className="font-jost text-black text-mobile-2xl md:text-2xl font-bold">
+                <p className="font-bold text-black font-jost text-mobile-2xl md:text-2xl">
                   Delivery Information {userStatus()}
                 </p>
 
                 <div className="mt-2 space-y-6">
                   {user && (
                     <div className="space-y-3">
-                      <p className="flex items-center gap-2 font-jost text-black text-mobile-xl md:text-xl font-light leading-normal tracking-wide">
+                      <p className="flex items-center gap-2 font-light leading-normal tracking-wide text-black font-jost text-mobile-xl md:text-xl">
                         Name: {userName}
                       </p>
-                      <p className="flex items-center gap-2 font-jost text-black text-mobile-xl md:text-xl font-light leading-normal tracking-wide">
+                      <p className="flex items-center gap-2 font-light leading-normal tracking-wide text-black font-jost text-mobile-xl md:text-xl">
                         Email: {userEmail}
                       </p>
-                      <p className="flex items-center gap-2 font-jost text-black text-mobile-xl md:text-xl font-light leading-normal tracking-wide">
+                      <p className="flex items-center gap-2 font-light leading-normal tracking-wide text-black font-jost text-mobile-xl md:text-xl">
                         Address: {userAddress}
                       </p>
-                      <p className="flex items-center gap-2 font-jost text-black text-mobile-xl md:text-xl font-light leading-normal tracking-wide">
+                      <p className="flex items-center gap-2 font-light leading-normal tracking-wide text-black font-jost text-mobile-xl md:text-xl">
                         Phone Number: {userPhone}
                       </p>
                     </div>
@@ -189,17 +195,17 @@ const OrderDetail: FC<OrderDetailProps> = () => {
               </div>
 
               <div className="mt-8">
-                <p className="font-jost text-black text-mobile-2xl md:text-2xl font-bold">
+                <p className="font-bold text-black font-jost text-mobile-2xl md:text-2xl">
                   Additional Information
                 </p>
 
                 <div className="mt-2 space-y-6">
                   {isHasExtraInfo && (
                     <div className="space-y-3">
-                      <p className="flex items-center gap-2 font-jost text-black text-mobile-xl md:text-xl font-light leading-normal tracking-wide">
+                      <p className="flex items-center gap-2 font-light leading-normal tracking-wide text-black font-jost text-mobile-xl md:text-xl">
                         Address: {offlineUserAddress}
                       </p>
-                      <p className="flex items-center gap-2 font-jost text-black text-mobile-xl md:text-xl font-light leading-normal tracking-wide">
+                      <p className="flex items-center gap-2 font-light leading-normal tracking-wide text-black font-jost text-mobile-xl md:text-xl">
                         Phone Number: {offlineUserPhone}
                       </p>
                     </div>
@@ -207,8 +213,7 @@ const OrderDetail: FC<OrderDetailProps> = () => {
                 </div>
               </div>
             </div>
-
-            <div className="mt-10 flex items-center gap-4 space-x-3">
+            <div className="flex items-center gap-4 mt-10 space-x-3">
               <OrderStatusAssignModal
                 id={id}
                 status={status}

@@ -7,13 +7,13 @@ const OrderProductList = ({ items }: { items: any }) => {
   const navigate = useNavigate();
   return (
     <>
-      <p className="font-jost text-black text-mobile-2xl md:text-2xl font-bold">
+      <p className="font-bold text-black font-jost text-mobile-2xl md:text-2xl">
         Products
       </p>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 mt-2">
+      <div className="grid grid-cols-1 mt-2 md:grid-cols-3">
         {items.map((item: any) => {
-          const { product, quantity, price, color, size } = item;
+          const { product, price } = item;
           const displayImage = product?.displayImage || "";
           const name = product?.name || "Unnamed Product";
           const productId = product?.id || "";
@@ -30,7 +30,7 @@ const OrderProductList = ({ items }: { items: any }) => {
             <div className="flex flex-col gap-2" key={item.id}>
               <Card
                 onClick={gotoDetailedProduct}
-                className="shadow-none rounded-lg hover:border-1 hover:cursor-pointer"
+                className="rounded-lg shadow-none hover:border-1 hover:cursor-pointer"
               >
                 <CardMedia
                   component="img"
@@ -42,25 +42,25 @@ const OrderProductList = ({ items }: { items: any }) => {
                 <CardContent>
                   <Typography
                     variant="h6"
-                    className="font-crimson text-black text-mobile-xl md:text-xl font-bold leading-normal tracking-wide"
+                    className="font-bold leading-normal tracking-wide text-black font-crimson text-mobile-xl md:text-xl"
                   >
                     {name}
                   </Typography>
-                  <Typography className="font-jost text-black text-mobile-xl md:text-lg font-light leading-normal tracking-wide">
+                  <Typography className="font-light leading-normal tracking-wide text-black font-jost text-mobile-xl md:text-lg">
                     Model Number: {productModelNumber}
                   </Typography>
-                  <Typography className="font-jost text-black text-mobile-xl md:text-lg font-light leading-normal tracking-wide">
+                  <Typography className="font-light leading-normal tracking-wide text-black font-jost text-mobile-xl md:text-lg">
                     Price: {formatCurrency(price || 0)}
                   </Typography>
-                  <Typography className="font-jost text-black text-mobile-xl md:text-lg font-light leading-normal tracking-wide">
+                  {/* <Typography className="font-light leading-normal tracking-wide text-black font-jost text-mobile-xl md:text-lg">
                     Quantity: {quantity}
                   </Typography>
-                  <Typography className="font-jost text-black text-mobile-xl md:text-lg font-light leading-normal tracking-wide">
+                  <Typography className="font-light leading-normal tracking-wide text-black font-jost text-mobile-xl md:text-lg">
                     Color: {color || "N/A"}
                   </Typography>
-                  <Typography className="font-jost text-black text-mobile-xl md:text-lg font-light leading-normal tracking-wide">
+                  <Typography className="font-light leading-normal tracking-wide text-black font-jost text-mobile-xl md:text-lg">
                     Size: {size || "N/A"}
-                  </Typography>
+                  </Typography> */}
                 </CardContent>
               </Card>
             </div>

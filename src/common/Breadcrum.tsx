@@ -31,7 +31,7 @@ export function ListItemLink(props: ListItemLinkProps) {
   const { to, open, ...other } = props;
   const primary = other.children;
 
-  let icon = null;
+  let icon: React.ReactNode = null;
   if (open != null) {
     icon = open ? <Expand01 /> : <DotsHorizontal />;
   }
