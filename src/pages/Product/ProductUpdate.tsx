@@ -278,9 +278,9 @@ const ProductUpdate: FC<ProductUpdateProps> = () => {
             payload.keyattribute = formattedKeyattributeArray; // Assuming `formattedKeyattributeArray` is already defined
           }
 
-          if (values.variants && values.variants.length > 0) {
+          // if (values.variants && values.variants.length > 0) {
             payload.variants = formattedVariantsArray; // Assuming `formattedKeyattributeArray` is already defined
-          }
+          // }
 
           return payload;
         };
@@ -299,7 +299,7 @@ const ProductUpdate: FC<ProductUpdateProps> = () => {
           medias: values.medias,
           specification: formattedSpecificationArray,
           keyattribute: formattedKeyattributeArray,
-          variants: formattedVariantsArray,
+          variants: formattedVariantsArray || [],
         };
 
         // console.log("DATA ::", {
