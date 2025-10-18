@@ -15,6 +15,7 @@ import OrderDeleteButton from "./OrderDeleteButton";
 import LoadingContent from "@/common/LoadingContent/LoadingContent";
 import { objectToArray } from "@/utils/ObjectUtils";
 import ProductDynamicKeyValueTio from "../Product/components/ProductDynamicKeyValueTio";
+import OrderDynamicKeyValue from "./OrderDynamicKeyValue";
 
 interface OrderDetailProps {}
 const OrderDetail: FC<OrderDetailProps> = () => {
@@ -40,6 +41,7 @@ const OrderDetail: FC<OrderDetailProps> = () => {
   const offlineUserPhone = orderInfoResponse?.offlineUser?.phone || "N/A";
 
   const variant = orderInfoResponse?.variant || null;
+  const freeGift = orderInfoResponse?.user?.freeGift || null;
   const total = orderInfoResponse?.total || 0;
   const amountToPay = orderInfoResponse?.amountToPay || 0;
   const status = orderInfoResponse?.status || "";
@@ -117,6 +119,13 @@ const OrderDetail: FC<OrderDetailProps> = () => {
                 data={[orderInfoResponse?.variant]}
               />
             )}
+
+            {freeGift && (
+              <OrderDynamicKeyValue
+                title="Free Gift"
+                data={orderInfoResponse?.user?.freeGift || []}
+              />
+            )}
             <div className="grid grid-cols-1 gap-0 md:grid-cols-2">
               <div className="mt-8">
                 <p className="font-bold text-black font-jost text-mobile-2xl md:text-2xl">
@@ -146,18 +155,23 @@ const OrderDetail: FC<OrderDetailProps> = () => {
                         Option: {paymentOption}
                       </p>
 
-                      <p className="flex items-center gap-2 font-light leading-normal tracking-wide text-black font-jost text-mobile-xl md:text-xl">
-                        Total Cost: {formatCurrency(variant?.prices || 0)}
-                      </p>
-
                       {paymentOption === "FULL" ? (
                         <>
                           <p className="flex items-center gap-2 font-light leading-normal tracking-wide text-black font-jost text-mobile-xl md:text-xl">
-                            Amount Paid: {formatCurrency(variant?.prices || 0)}
+                            Unit Cost: {formatCurrency(variant?.prices || 0)}
+                          </p>
+                          <p className="flex items-center gap-2 font-light leading-normal tracking-wide text-black font-jost text-mobile-xl md:text-xl">
+                            Amount Paid:{" "}
+                            {formatCurrency(
+                              variant?.prices * variant?.qty || 0
+                            )}
                           </p>
                         </>
                       ) : (
                         <>
+                          <p className="flex items-center gap-2 font-light leading-normal tracking-wide text-black font-jost text-mobile-xl md:text-xl">
+                            Total Cost: {formatCurrency(variant?.prices || 0)}
+                          </p>
                           <p className="flex items-center gap-2 font-light leading-normal tracking-wide text-black font-jost text-mobile-xl md:text-xl">
                             Amount Paid:{" "}
                             {formatCurrency(variant?.amountToPay) || 0}
