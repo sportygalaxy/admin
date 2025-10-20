@@ -50,7 +50,10 @@ const OrderProductList = ({ items }: { items: any }) => {
                     Model Number: {productModelNumber}
                   </Typography>
                   <Typography className="font-light leading-normal tracking-wide text-black font-jost text-mobile-xl md:text-lg">
-                    Price: {formatCurrency(price || 0)}
+                    Price: {formatCurrency(product?.price || 0)}
+                  </Typography>
+                  <Typography className="font-light leading-normal tracking-wide text-black font-jost text-mobile-xl md:text-lg">
+                    Sales Price: {formatCurrency(product?.salesPrice || 0)}
                   </Typography>
                   <Typography className="font-light leading-normal tracking-wide text-black font-jost text-mobile-xl md:text-lg">
                     Quantity: {quantity}
