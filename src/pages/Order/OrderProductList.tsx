@@ -13,7 +13,7 @@ const OrderProductList = ({ items }: { items: any }) => {
 
       <div className="grid grid-cols-1 mt-2 md:grid-cols-3">
         {items.map((item: any) => {
-          const { product, price, quantity } = item;
+          const { product, quantity } = item;
           const displayImage = product?.displayImage || "";
           const name = product?.name || "Unnamed Product";
           const productId = product?.id || "";
