@@ -86,6 +86,14 @@ const ColorTable: FC<ColorTableProps> = ({ onEdit }) => {
                     #
                   </Typography>
                 </th>
+                <th className="w-20 p-6 py-3 font-medium">
+                  <Typography
+                    color="grey.700"
+                    className="text-sm font-medium capitalize font-inter"
+                  >
+                    Preview
+                  </Typography>
+                </th>
                 <th className="p-6 py-3 font-medium">
                   <Typography
                     color="grey.700"
@@ -112,6 +120,14 @@ const ColorTable: FC<ColorTableProps> = ({ onEdit }) => {
                   className="py-5 border-b-1 border-[#EAECF0] hover:bg-[#F3F4F7]"
                 >
                   <td className="p-6 py-4 align-top">{index + 1}</td>
+                  <td className="p-6 py-4">
+                    <div
+                      className="w-9 h-9 rounded-full border border-[#EAECF0] shadow-inner"
+                      style={{
+                        backgroundColor: color.name || "#EAECF0",
+                      }}
+                    />
+                  </td>
                   <td className="p-6 py-4 font-semibold text-black">
                     <Typography
                       color="grey.700"

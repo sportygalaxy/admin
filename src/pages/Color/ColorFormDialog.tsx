@@ -70,6 +70,11 @@ const ColorFormDialog: FC<ColorFormDialogProps> = ({
     },
   });
 
+  const previewColor = formik.values.name?.trim() || "";
+  const swatchStyle = previewColor
+    ? { backgroundColor: previewColor }
+    : { backgroundColor: "#EAECF0" };
+
   useEffect(() => {
     if (!open) {
       formik.resetForm();
@@ -118,6 +123,26 @@ const ColorFormDialog: FC<ColorFormDialogProps> = ({
             error={formik.touched.name && Boolean(formik.errors.name)}
             helperText={formik.touched.name && formik.errors.name}
           />
+          <div className="flex items-center gap-3 mt-4">
+            <div
+              className="w-10 h-10 rounded-full border border-[#EAECF0] shadow-inner"
+              style={swatchStyle}
+            />
+            <div>
+              <Typography
+                color="grey.700"
+                className="text-[8px] font-medium capitalize font-inter"
+              >
+                Preview
+              </Typography>
+              <Typography
+                color="grey.500"
+                className="text-sm font-medium capitalize font-inter"
+              >
+                {previewColor || "No color set"}
+              </Typography>
+            </div>
+          </div>
         </DialogContent>
         <DialogActions className="px-6 pb-4">
           <Button
