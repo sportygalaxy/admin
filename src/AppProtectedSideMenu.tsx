@@ -16,6 +16,7 @@ import {
   Home03,
   LogOut01,
   MessageChatSquare,
+  Palette,
   SearchLg,
   Settings01,
   Users01,
@@ -52,6 +53,11 @@ const NORMAL_LINKS: LinkType[] = [
     title: "Products",
     icon: <SearchLg />,
     path: routeEnum.PRODUCTS,
+  },
+  {
+    title: "Colors",
+    icon: <Palette />,
+    path: routeEnum.PRODUCT_COLORS,
   },
   {
     title: "Reviews",
