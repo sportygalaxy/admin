@@ -80,23 +80,6 @@ const BOTTOM_LINKS: LinkType[] = [
 
 const ACCORDION_LINKS: AccordionLinkType[] = [
   {
-    title: "Users",
-    icon: <Users01 color="black" />,
-    subLinks: [
-      {
-        title: "Clients",
-        icon: <></>,
-        path: routeEnum.USERS_CLIENTS,
-      },
-      {
-        title: "Employees",
-        icon: <></>,
-        path: routeEnum.USERS_EMPLOYEES,
-      },
-    ],
-    isAccordion: true,
-  },
-  {
     title: "Products",
     icon: <SearchLg color="black" />,
     subLinks: [
@@ -109,6 +92,23 @@ const ACCORDION_LINKS: AccordionLinkType[] = [
         title: "Colors",
         icon: <></>,
         path: routeEnum.PRODUCT_COLORS,
+      },
+    ],
+    isAccordion: true,
+  },
+  {
+    title: "Users",
+    icon: <Users01 color="black" />,
+    subLinks: [
+      {
+        title: "Clients",
+        icon: <></>,
+        path: routeEnum.USERS_CLIENTS,
+      },
+      {
+        title: "Employees",
+        icon: <></>,
+        path: routeEnum.USERS_EMPLOYEES,
       },
     ],
     isAccordion: true,
@@ -206,9 +206,9 @@ const NavAccordion = ({ title, icon, subLinks }: AccordionLinkType) => {
 const AppProtectedSideMenu: React.FC<Props> = ({ className = "" }) => {
   // Combine normal links and accordion links
   const COMBINED_LINKS: CombinedLinkType[] = [
-    ...NORMAL_LINKS.slice(0, 3), // "Dashboard" and "Explore Marketplace"
-    ...ACCORDION_LINKS, // Insert "Users" accordion link here
-    ...NORMAL_LINKS.slice(3), // Rest of the normal links starting with "Leads"
+    ...NORMAL_LINKS.slice(0, 1), // "Dashboard"
+    ...ACCORDION_LINKS, // Insert "Users" and "Products" accordion link here
+    ...NORMAL_LINKS.slice(1), // "Review" and "Other links"
   ];
 
   // Type guard to check if the link is an AccordionLinkType

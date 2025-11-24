@@ -103,7 +103,7 @@ const ColorFormDialog: FC<ColorFormDialogProps> = ({
         <DialogContent className="pt-2">
           <TextField
             variant="outlined"
-            className="MuiTextFieldOutlined--plain"
+            className="capitalize MuiTextFieldOutlined--plain"
             size="small"
             autoFocus
             margin="dense"
