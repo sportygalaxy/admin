@@ -74,7 +74,7 @@ const ColorFormDialog: FC<ColorFormDialogProps> = ({
     if (!open) {
       formik.resetForm();
     }
-  }, [open, formik]);
+  }, [open]);
 
   return (
     <Dialog

@@ -41,13 +41,13 @@ const Color: FC = () => {
             <Breadcrumb breadcrumbItems={breadcrumbItems} />
             <Typography
               color="grey.900"
-              className="font-bold text-2xl font-crimson"
+              className="text-2xl font-bold font-crimson"
             >
               Colors
             </Typography>
             <Typography
               color="grey.600"
-              className="font-medium text-sm font-inter mt-1"
+              className="mt-1 text-sm font-medium font-inter"
             >
               Create, edit, or remove product colors.
             </Typography>
@@ -56,7 +56,7 @@ const Color: FC = () => {
         <Button
           variant="contained"
           startIcon={<PlusCircle width={20} height={20} />}
-          className="capitalize font-bold font-inter"
+          className="font-bold capitalize font-inter"
           size="large"
           onClick={handleAddColor}
         >
