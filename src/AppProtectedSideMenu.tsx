@@ -49,11 +49,6 @@ const NORMAL_LINKS: LinkType[] = [
     path: routeEnum.DASHBOARD,
   },
   {
-    title: "Products",
-    icon: <SearchLg />,
-    path: routeEnum.PRODUCTS,
-  },
-  {
     title: "Reviews",
     icon: <MessageChatSquare />,
     path: routeEnum.REVIEWS,
@@ -84,6 +79,23 @@ const BOTTOM_LINKS: LinkType[] = [
 ];
 
 const ACCORDION_LINKS: AccordionLinkType[] = [
+  {
+    title: "Products",
+    icon: <SearchLg color="black" />,
+    subLinks: [
+      {
+        title: "Products",
+        icon: <></>,
+        path: routeEnum.PRODUCTS,
+      },
+      {
+        title: "Colors",
+        icon: <></>,
+        path: routeEnum.PRODUCT_COLORS,
+      },
+    ],
+    isAccordion: true,
+  },
   {
     title: "Users",
     icon: <Users01 color="black" />,
@@ -121,14 +133,14 @@ const NavLinkItem = ({ title, icon, path, isAccordion }: LinkType) => {
           }
         >
           {icon}
-          <span className="ml-3 text-base font-medium text-black font-inter capitalize">
+          <span className="ml-3 text-base font-medium text-black capitalize font-inter">
             {title}
           </span>
         </NavLink>
       ) : (
         <div onClick={logout} className={`${defaultClass} cursor-pointer`}>
           {icon}
-          <span className="ml-3 text-base font-medium text-black font-inter capitalize">
+          <span className="ml-3 text-base font-medium text-black capitalize font-inter">
             {title}
           </span>
         </div>
@@ -149,6 +161,7 @@ const NavAccordion = ({ title, icon, subLinks }: AccordionLinkType) => {
       sx={{
         background: "transparent",
         boxShadow: "none",
+        border: "none",
         marginBottom: "20px",
       }}
       expanded={expanded}
@@ -170,7 +183,7 @@ const NavAccordion = ({ title, icon, subLinks }: AccordionLinkType) => {
       >
         <div className="flex items-center">
           {icon}
-          <span className="ml-3 text-base font-medium text-black font-inter capitalize">
+          <span className="ml-3 text-base font-medium text-black capitalize font-inter">
             {title}
           </span>
         </div>
@@ -193,9 +206,9 @@ const NavAccordion = ({ title, icon, subLinks }: AccordionLinkType) => {
 const AppProtectedSideMenu: React.FC<Props> = ({ className = "" }) => {
   // Combine normal links and accordion links
   const COMBINED_LINKS: CombinedLinkType[] = [
-    ...NORMAL_LINKS.slice(0, 3), // "Dashboard" and "Explore Marketplace"
-    ACCORDION_LINKS[0], // Insert "Users" accordion link here
-    ...NORMAL_LINKS.slice(3), // Rest of the normal links starting with "Leads"
+    ...NORMAL_LINKS.slice(0, 1), // "Dashboard"
+    ...ACCORDION_LINKS, // Insert "Users" and "Products" accordion link here
+    ...NORMAL_LINKS.slice(1), // "Review" and "Other links"
   ];
 
   // Type guard to check if the link is an AccordionLinkType

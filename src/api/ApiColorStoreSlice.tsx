@@ -26,17 +26,18 @@ export const ApiColorStoreSlice = sportygalaxyAdminApi.injectEndpoints({
       invalidatesTags: [RtkqTagEnum.PRODUCTS, RtkqTagEnum.COLORS],
     }),
     updateColor: builder.mutation<any, any>({
-      query: ({ ...data }: any) => ({
-        url: "/products/color",
-        data,
-        method: "PUT",
-      }),
+      query: ({ id, ...data }: any) => {
+        return {
+          url: `/products/color/${id}`,
+          data,
+          method: "PUT",
+        };
+      },
       invalidatesTags: [RtkqTagEnum.PRODUCTS, RtkqTagEnum.COLORS],
     }),
     deleteColor: builder.mutation<any, any>({
-      query: ({ ...data }: any) => ({
-        url: "/products/color",
-        data,
+      query: ({ id }: any) => ({
+        url: `/products/color/${id}`,
         method: "DELETE",
       }),
       onQueryStarted: async ({ queryFulfilled }: any) => {

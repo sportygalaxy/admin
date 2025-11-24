@@ -91,15 +91,29 @@ const theme = createTheme(baseTheme, {
     ...headingStyles("Crimson Pro, serif"),
   },
   components: {
-    MuiAccordionSummary: {
-      styleOverrides: {
-        content: {
-          "&.Mui-expanded": {
-            margin: "0px 0 10px 0",
-          },
+    MuiAccordion: {
+    styleOverrides: {
+      root: {
+        '&::before': {
+          display: 'none', // remove default divider line
+        },
+        backgroundColor: "transparent",
+        boxShadow: "none",
+      },
+    },
+  },
+  MuiAccordionSummary: {
+    styleOverrides: {
+      root: {
+        border: "none!important",
+      },
+      content: {
+        "&.Mui-expanded": {
+          margin: "0px 0 10px 0",
         },
       },
     },
+  },
     MuiButton: {
       styleOverrides: {
         root: {

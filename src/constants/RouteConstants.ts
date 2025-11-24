@@ -5,10 +5,11 @@ export const routeEnum = {
 
   USERS: "/users",
 
-  PRODUCTS: "/products",
+  PRODUCTS: "/products/product-list",
   PRODUCTS_CREATE: "/products/create",
   PRODUCTS_UPDATE: "/products/:id/update",
   PRODUCT_DETAILS: "/products/:id",
+  PRODUCT_COLORS: "/products/color-list",
 
   REVIEWS: "/reviews",
 
