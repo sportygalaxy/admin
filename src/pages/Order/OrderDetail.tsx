@@ -2,7 +2,7 @@ import { ApiOrderStoreSlice } from "@/api/ApiOrderStoreSlice";
 import BackButton from "@/common/BackButton";
 import { formatCurrency } from "@/utils/currencyUtils";
 import { Chip, Typography } from "@mui/material";
-import { FC } from "react";
+import { FC, useMemo } from "react";
 import { useParams } from "react-router-dom";
 
 import SportygalaxyLoadingIndicator from "@/common/Loading/SportygalaxyLoadingIndicator";
@@ -20,66 +20,120 @@ import OrderDynamicKeyValue from "./OrderDynamicKeyValue";
 interface OrderDetailProps {}
 const OrderDetail: FC<OrderDetailProps> = () => {
   const { id } = useParams<{ id: string }>() as { id: string };
-  const getOrderInfoQuery = ApiOrderStoreSlice.useGetOrderInfoQuery(
-    {
-      id,
-    },
-    { skip: !id }
-  );
-  const orderInfoResponse = getOrderInfoQuery?.data?.data;
+  const {
+    data,
+    isLoading,
+    isError,
+    refetch,
+  } = ApiOrderStoreSlice.useGetOrderInfoQuery({ id }, { skip: !id });
+  const order = data?.data;
 
-  const user = orderInfoResponse?.user || orderInfoResponse?.offlineUser || {};
-  const isOfflineUser = !orderInfoResponse?.user;
-  const isHasExtraInfo =
-    orderInfoResponse?.user && orderInfoResponse?.offlineUser;
+  const {
+    user: onlineUser,
+    offlineUser,
+    variant,
+    total = 0,
+    amountToPay = 0,
+    amountPaid = 0,
+    shippingFee = 0,
+    shippingState = 0,
+    status = "",
+    paymentOption = "",
+    items,
+  } = order || {};
+
+  const user = onlineUser || offlineUser || {};
+  const isOfflineUser = !onlineUser;
+  const isHasExtraInfo = Boolean(onlineUser && offlineUser);
+
   const userName = `${user?.firstName || "N/A"} ${user?.lastName || "N/A"}`;
   const userEmail = user?.email || "N/A";
   const userAddress = user?.address || "N/A";
   const userPhone = user?.phone || "N/A";
 
-  const offlineUserAddress = orderInfoResponse?.offlineUser?.address || "N/A";
-  const offlineUserPhone = orderInfoResponse?.offlineUser?.phone || "N/A";
+  const offlineUserAddress = offlineUser?.address || "N/A";
+  const offlineUserPhone = offlineUser?.phone || "N/A";
 
-  const variant = orderInfoResponse?.variant || null;
-  const freeGift = orderInfoResponse?.user?.freeGift || null;
-  const total = orderInfoResponse?.total || 0;
-  const amountToPay = orderInfoResponse?.amountToPay || 0;
-  const status = orderInfoResponse?.status || "";
-  const paymentOption = orderInfoResponse?.paymentOption || "";
+  const freeGift = onlineUser?.freeGift || null;
 
-  const isDeleted = orderInfoResponse?.isDeleted ?? false;
-  const isCanceled =
-    orderInfoResponse?.status === ORDER_STATUS.CANCELED || false;
+  const isDeleted = order?.isDeleted ?? false;
+  const isCanceled = status === ORDER_STATUS.CANCELED || false;
   const isDisabled = isDeleted || isCanceled;
 
-  // Generate dynamic text based on the flags
-  const dynamicText = [
-    isDeleted ? "ORDER DELETED" : null,
-    isCanceled ? "ORDER CANCELED" : null,
-  ]
-    .filter(Boolean) // Remove null values
-    .join(" and "); // Combine the text dynamically
+  const dynamicText = useMemo(
+    () =>
+      [isDeleted ? "ORDER DELETED" : null, isCanceled ? "ORDER CANCELED" : null]
+        .filter(Boolean)
+        .join(" and "),
+    [isCanceled, isDeleted]
+  );
 
-  const userStatus = (): JSX.Element => {
-    return (
-      <>
-        {isOfflineUser ? (
-          <Chip
-            color="error"
-            className="text-xs font-medium font-inter"
-            icon={<span className="w-2 h-2 rounded-full bg-[#F04438]"></span>}
-            label="Offline Customer"
-          />
-        ) : (
-          <Chip
-            color="success"
-            icon={<span className="w-2 h-2 rounded-full bg-[#1BA879]"></span>}
-            label="Online Customer"
-          />
-        )}
-      </>
-    );
-  };
+  const infoTextClass =
+    "flex items-center gap-2 font-light leading-normal tracking-wide text-black font-jost text-mobile-xl md:text-xl";
+
+  const userStatusChip = isOfflineUser ? (
+    <Chip
+      color="error"
+      className="text-xs font-medium font-inter"
+      icon={<span className="w-2 h-2 rounded-full bg-[#F04438]" />}
+      label="Offline Customer"
+    />
+  ) : (
+    <Chip
+      color="success"
+      icon={<span className="w-2 h-2 rounded-full bg-[#1BA879]" />}
+      label="Online Customer"
+    />
+  );
+
+  const deliveryInfoRows = [
+    { label: "Name", value: userName },
+    { label: "Email", value: userEmail },
+    { label: "Address", value: userAddress },
+    { label: "Phone Number", value: userPhone },
+    { label: "Shipping State", value: shippingState },
+  ];
+
+  const extraInfoRows = [
+    { label: "Address", value: offlineUserAddress },
+    { label: "Phone Number", value: offlineUserPhone },
+  ];
+
+  const paymentRows = variant
+    ? [
+        { label: "Option", value: paymentOption },
+        {
+          label: paymentOption === "FULL" ? "Unit Cost" : "Total Cost",
+          value: formatCurrency(variant?.prices || 0),
+        },
+        {
+          label: "Amount Paid",
+          value:
+            paymentOption === "FULL"
+              ? formatCurrency(amountPaid)
+              : formatCurrency(variant?.amountToPay || 0),
+        },
+        {
+          label: "Amount Remaining",
+          value:
+            paymentOption === "FULL"
+              ? "NIL"
+              : formatCurrency((variant?.prices || 0) - amountToPay),
+        },
+        { label: "Delivery Fee", value: formatCurrency(shippingFee) },
+      ]
+    : [
+        { label: "Option", value: paymentOption },
+        { label: "Total Cost", value: formatCurrency(total) },
+        {
+          label: "Amount Paid",
+          value:
+            paymentOption === "FULL"
+              ? formatCurrency(total)
+              : formatCurrency(total - amountToPay) || 0,
+        },
+        { label: "Amount Remaining", value: formatCurrency(amountToPay) || 0 },
+      ];
 
   return (
     <>
@@ -102,28 +156,23 @@ const OrderDetail: FC<OrderDetailProps> = () => {
         </div>
 
         <LoadingContent
-          loading={getOrderInfoQuery.isLoading}
-          error={getOrderInfoQuery.isError}
-          onReload={getOrderInfoQuery.refetch}
+          loading={isLoading}
+          error={isError}
+          onReload={refetch}
           loadingContent={<SportygalaxyLoadingIndicator />}
           // errorContent={<TableError onReload={() => refetch()} />}
           // emptyContent={</>}
-          data={objectToArray(orderInfoResponse)}
+          data={objectToArray(order)}
         >
           <div className="mt-10 space-y-10">
-            <OrderProductList items={orderInfoResponse?.items} />
+            <OrderProductList items={items} />
 
-            {variant && (
-              <ProductDynamicKeyValueTio
-                title="Variant"
-                data={[orderInfoResponse?.variant]}
-              />
-            )}
+            {variant && <ProductDynamicKeyValueTio title="Variant" data={[variant]} />}
 
             {freeGift && (
               <OrderDynamicKeyValue
                 title="Free Gift"
-                data={orderInfoResponse?.user?.freeGift || []}
+                data={onlineUser?.freeGift || []}
               />
             )}
             <div className="grid grid-cols-1 gap-0 md:grid-cols-2">
@@ -148,103 +197,30 @@ const OrderDetail: FC<OrderDetailProps> = () => {
                   Payments
                 </p>
 
-                {variant ? (
-                  <div className="mt-2 space-y-6">
-                    <div className="space-y-3">
-                      <p className="flex items-center gap-2 font-light leading-normal tracking-wide text-black font-jost text-mobile-xl md:text-xl">
-                        Option: {paymentOption}
+                <div className="mt-2 space-y-6">
+                  <div className="space-y-3">
+                    {paymentRows.map(({ label, value }) => (
+                      <p key={label} className={infoTextClass}>
+                        {label}: {value}
                       </p>
-
-                      {paymentOption === "FULL" ? (
-                        <>
-                          <p className="flex items-center gap-2 font-light leading-normal tracking-wide text-black font-jost text-mobile-xl md:text-xl">
-                            Unit Cost: {formatCurrency(variant?.prices || 0)}
-                          </p>
-                          <p className="flex items-center gap-2 font-light leading-normal tracking-wide text-black font-jost text-mobile-xl md:text-xl">
-                            Amount Paid:{" "}
-                            {formatCurrency(
-                              variant?.prices * variant?.qty || 0
-                            )}
-                          </p>
-                        </>
-                      ) : (
-                        <>
-                          <p className="flex items-center gap-2 font-light leading-normal tracking-wide text-black font-jost text-mobile-xl md:text-xl">
-                            Total Cost: {formatCurrency(variant?.prices || 0)}
-                          </p>
-                          <p className="flex items-center gap-2 font-light leading-normal tracking-wide text-black font-jost text-mobile-xl md:text-xl">
-                            Amount Paid:{" "}
-                            {formatCurrency(variant?.amountToPay) || 0}
-                          </p>
-                        </>
-                      )}
-
-                      <p className="flex items-center gap-2 font-light leading-normal tracking-wide text-black font-jost text-mobile-xl md:text-xl">
-                        Amount Remaining:{" "}
-                        {paymentOption === "FULL"
-                          ? "NIL"
-                          : formatCurrency(
-                              variant?.prices - variant?.amountToPay
-                            ) || 0}
-                      </p>
-                    </div>
+                    ))}
                   </div>
-                ) : (
-                  <div className="mt-2 space-y-6">
-                    <div className="space-y-3">
-                      <p className="flex items-center gap-2 font-light leading-normal tracking-wide text-black font-jost text-mobile-xl md:text-xl">
-                        Option: {paymentOption}
-                      </p>
-
-                      <p className="flex items-center gap-2 font-light leading-normal tracking-wide text-black font-jost text-mobile-xl md:text-xl">
-                        Total Cost: {formatCurrency(total || 0)}
-                      </p>
-
-                      {paymentOption === "FULL" ? (
-                        <>
-                          <p className="flex items-center gap-2 font-light leading-normal tracking-wide text-black font-jost text-mobile-xl md:text-xl">
-                            Amount Paid: {formatCurrency(total || 0)}
-                          </p>
-                        </>
-                      ) : (
-                        <>
-                          <p className="flex items-center gap-2 font-light leading-normal tracking-wide text-black font-jost text-mobile-xl md:text-xl">
-                            Amount Paid:
-                            {paymentOption === "FULL"
-                              ? "NIL"
-                              : formatCurrency(total - amountToPay) || 0}
-                          </p>
-                        </>
-                      )}
-
-                      <p className="flex items-center gap-2 font-light leading-normal tracking-wide text-black font-jost text-mobile-xl md:text-xl">
-                        Amount Remaining: {formatCurrency(amountToPay) || 0}
-                      </p>
-                    </div>
-                  </div>
-                )}
+                </div>
               </div>
 
               <div className="mt-8">
                 <p className="font-bold text-black font-jost text-mobile-2xl md:text-2xl">
-                  Delivery Information {userStatus()}
+                  Delivery Information {userStatusChip}
                 </p>
 
                 <div className="mt-2 space-y-6">
                   {user && (
                     <div className="space-y-3">
-                      <p className="flex items-center gap-2 font-light leading-normal tracking-wide text-black font-jost text-mobile-xl md:text-xl">
-                        Name: {userName}
-                      </p>
-                      <p className="flex items-center gap-2 font-light leading-normal tracking-wide text-black font-jost text-mobile-xl md:text-xl">
-                        Email: {userEmail}
-                      </p>
-                      <p className="flex items-center gap-2 font-light leading-normal tracking-wide text-black font-jost text-mobile-xl md:text-xl">
-                        Address: {userAddress}
-                      </p>
-                      <p className="flex items-center gap-2 font-light leading-normal tracking-wide text-black font-jost text-mobile-xl md:text-xl">
-                        Phone Number: {userPhone}
-                      </p>
+                      {deliveryInfoRows.map(({ label, value }) => (
+                        <p key={label} className={infoTextClass}>
+                          {label}: {value}
+                        </p>
+                      ))}
                     </div>
                   )}
                 </div>
@@ -258,12 +234,11 @@ const OrderDetail: FC<OrderDetailProps> = () => {
                 <div className="mt-2 space-y-6">
                   {isHasExtraInfo && (
                     <div className="space-y-3">
-                      <p className="flex items-center gap-2 font-light leading-normal tracking-wide text-black font-jost text-mobile-xl md:text-xl">
-                        Address: {offlineUserAddress}
-                      </p>
-                      <p className="flex items-center gap-2 font-light leading-normal tracking-wide text-black font-jost text-mobile-xl md:text-xl">
-                        Phone Number: {offlineUserPhone}
-                      </p>
+                      {extraInfoRows.map(({ label, value }) => (
+                        <p key={label} className={infoTextClass}>
+                          {label}: {value}
+                        </p>
+                      ))}
                     </div>
                   )}
                 </div>

@@ -93,6 +93,11 @@ const ACCORDION_LINKS: AccordionLinkType[] = [
         icon: <></>,
         path: routeEnum.PRODUCT_COLORS,
       },
+      {
+        title: "Sizes",
+        icon: <></>,
+        path: routeEnum.PRODUCT_SIZES,
+      },
     ],
     isAccordion: true,
   },

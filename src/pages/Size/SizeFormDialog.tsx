@@ -11,38 +11,34 @@ import {
   Typography,
 } from "@mui/material";
 import { LoadingButton } from "@mui/lab";
-import { ApiColorStoreSlice } from "@/api/ApiColorStoreSlice";
+import { ApiSizeStoreSlice } from "@/api/ApiSizeStoreSlice";
 import useExtendedSnackbar from "@/hooks/useExtendedSnackbar";
-import { ColorItem } from "./ColorTypes";
+import { SizeItem } from "./SizeTypes";
 
-type ColorFormDialogProps = {
+type SizeFormDialogProps = {
   open: boolean;
   onClose: () => void;
-  color?: ColorItem;
+  size?: SizeItem;
 };
 
 const validationSchema = Yup.object({
-  name: Yup.string().trim().required("Color name is required"),
+  name: Yup.string().trim().required("Size name is required"),
 });
 
-const ColorFormDialog: FC<ColorFormDialogProps> = ({
-  open,
-  onClose,
-  color,
-}) => {
+const SizeFormDialog: FC<SizeFormDialogProps> = ({ open, onClose, size }) => {
   const { showSuccessSnackbar, showErrorSnackbar } = useExtendedSnackbar();
-  const [createColor, createColorResult] =
-    ApiColorStoreSlice.useCreateColorMutation();
-  const [updateColor, updateColorResult] =
-    ApiColorStoreSlice.useUpdateColorMutation();
+  const [createSize, createSizeResult] =
+    ApiSizeStoreSlice.useCreateSizeMutation();
+  const [updateSize, updateSizeResult] =
+    ApiSizeStoreSlice.useUpdateSizeMutation();
 
-  const isEditing = Boolean(color?.id);
-  const isLoading = createColorResult.isLoading || updateColorResult.isLoading;
+  const isEditing = Boolean(size?.id);
+  const isLoading = createSizeResult.isLoading || updateSizeResult.isLoading;
 
   const formik = useFormik({
     enableReinitialize: true,
     initialValues: {
-      name: color?.name || "",
+      name: size?.name || "",
     },
     validationSchema,
     onSubmit: async (values, helpers) => {
@@ -52,14 +48,12 @@ const ColorFormDialog: FC<ColorFormDialogProps> = ({
         };
 
         const response = isEditing
-          ? await updateColor({ id: color?.id, ...payload }).unwrap()
-          : await createColor(payload).unwrap();
+          ? await updateSize({ id: size?.id, ...payload }).unwrap()
+          : await createSize(payload).unwrap();
 
         showSuccessSnackbar(
           response?.message ||
-            (isEditing
-              ? "Color updated successfully"
-              : "Color created successfully")
+            (isEditing ? "Size updated successfully" : "Size created successfully")
         );
 
         helpers.resetForm();
@@ -69,11 +63,6 @@ const ColorFormDialog: FC<ColorFormDialogProps> = ({
       }
     },
   });
-
-  const previewColor = formik.values.name?.trim() || "";
-  const swatchStyle = previewColor
-    ? { backgroundColor: previewColor }
-    : { backgroundColor: "#EAECF0" };
 
   useEffect(() => {
     if (!open) {
@@ -101,7 +90,7 @@ const ColorFormDialog: FC<ColorFormDialogProps> = ({
             color="grey.700"
             className="text-base font-medium capitalize font-inter"
           >
-            {isEditing ? "Edit color" : "Add new color"}
+            {isEditing ? "Edit size" : "Add new size"}
           </Typography>
         </DialogTitle>
 
@@ -114,7 +103,7 @@ const ColorFormDialog: FC<ColorFormDialogProps> = ({
             margin="dense"
             id="name"
             name="name"
-            placeholder="e.g. Blue"
+            placeholder="e.g. Large"
             type="text"
             fullWidth
             value={formik.values.name}
@@ -123,26 +112,6 @@ const ColorFormDialog: FC<ColorFormDialogProps> = ({
             error={formik.touched.name && Boolean(formik.errors.name)}
             helperText={formik.touched.name && formik.errors.name}
           />
-          <div className="flex items-center gap-3 mt-4">
-            <div
-              className="w-10 h-10 rounded-full border border-[#EAECF0] shadow-inner"
-              style={swatchStyle}
-            />
-            <div>
-              <Typography
-                color="grey.700"
-                className="text-[8px] font-medium capitalize font-inter"
-              >
-                Preview
-              </Typography>
-              <Typography
-                color="grey.500"
-                className="text-sm font-medium capitalize font-inter"
-              >
-                {previewColor || "No color set"}
-              </Typography>
-            </div>
-          </div>
         </DialogContent>
         <DialogActions className="px-6 pb-4">
           <Button
@@ -160,7 +129,7 @@ const ColorFormDialog: FC<ColorFormDialogProps> = ({
             className="font-semibold capitalize"
             loading={isLoading}
           >
-            {isEditing ? "Save changes" : "Create color"}
+            {isEditing ? "Save changes" : "Create size"}
           </LoadingButton>
         </DialogActions>
       </form>
@@ -168,4 +137,4 @@ const ColorFormDialog: FC<ColorFormDialogProps> = ({
   );
 };
 
-export default ColorFormDialog;
+export default SizeFormDialog;

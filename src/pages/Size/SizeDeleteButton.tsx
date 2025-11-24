@@ -1,31 +1,29 @@
 import { FC } from "react";
 import { LoadingButton } from "@mui/lab";
 import { Trash04 } from "@untitled-ui/icons-react";
-import { ApiColorStoreSlice } from "@/api/ApiColorStoreSlice";
+import { ApiSizeStoreSlice } from "@/api/ApiSizeStoreSlice";
 import useExtendedSnackbar from "@/hooks/useExtendedSnackbar";
 import { useConfirmDialog } from "@/hooks/useConfirmDialog";
-import { ColorItem } from "./ColorTypes";
+import { SizeItem } from "./SizeTypes";
 
-type ColorDeleteButtonProps = {
-  color: ColorItem;
+type SizeDeleteButtonProps = {
+  size: SizeItem;
 };
 
-const ColorDeleteButton: FC<ColorDeleteButtonProps> = ({ color }) => {
+const SizeDeleteButton: FC<SizeDeleteButtonProps> = ({ size }) => {
   const confirm = useConfirmDialog();
   const { showSuccessSnackbar, showErrorSnackbar } = useExtendedSnackbar();
-  const [deleteColor, deleteColorResult] =
-    ApiColorStoreSlice.useDeleteColorMutation();
+  const [deleteSize, deleteSizeResult] =
+    ApiSizeStoreSlice.useDeleteSizeMutation();
 
   const handleDelete = () => {
     confirm({
-      title: "Delete color?",
-      description: `This will remove "${color.name}" from your catalog.`,
+      title: "Delete size?",
+      description: `This will remove "${size.name}" from your catalog.`,
       onConfirm: async () => {
         try {
-          const response = await deleteColor({ id: color.id }).unwrap();
-          showSuccessSnackbar(
-            response?.message || "Color deleted successfully"
-          );
+          const response = await deleteSize({ id: size.id }).unwrap();
+          showSuccessSnackbar(response?.message || "Size deleted successfully");
         } catch (error: any) {
           showErrorSnackbar(error?.data?.message || "Error occured");
         }
@@ -43,7 +41,7 @@ const ColorDeleteButton: FC<ColorDeleteButtonProps> = ({ color }) => {
       size="small"
       variant="text"
       color="error"
-      loading={deleteColorResult.isLoading}
+      loading={deleteSizeResult.isLoading}
       onClick={handleDelete}
       className="!normal-case font-semibold"
     >
@@ -52,4 +50,4 @@ const ColorDeleteButton: FC<ColorDeleteButtonProps> = ({ color }) => {
   );
 };
 
-export default ColorDeleteButton;
+export default SizeDeleteButton;

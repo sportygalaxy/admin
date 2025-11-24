@@ -26,17 +26,18 @@ export const ApiSizeStoreSlice = sportygalaxyAdminApi.injectEndpoints({
       invalidatesTags: [RtkqTagEnum.PRODUCTS, RtkqTagEnum.SIZES],
     }),
     updateSize: builder.mutation<any, any>({
-      query: ({ ...data }: any) => ({
-        url: "/products/size",
-        data,
-        method: "PUT",
-      }),
+      query: ({ id, ...data }: any) => {
+        return {
+          url: `/products/size/${id}`,
+          data,
+          method: "PUT",
+        };
+      },
       invalidatesTags: [RtkqTagEnum.PRODUCTS, RtkqTagEnum.SIZES],
     }),
     deleteSize: builder.mutation<any, any>({
-      query: ({ ...data }: any) => ({
-        url: "/products/size",
-        data,
+      query: ({ id }: any) => ({
+        url: `/products/size/${id}`,
         method: "DELETE",
       }),
       onQueryStarted: async ({ queryFulfilled }: any) => {
