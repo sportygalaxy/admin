@@ -53,6 +53,12 @@ export const ApiTransactionStoreSlice = sportygalaxyAdminApi.injectEndpoints({
       },
       providesTags: [RtkqTagEnum.TRANSACTIONS],
     }),
+    getTransactionInfo: builder.query<any, { id: string }>({
+      query: ({ id }) => ({
+        url: `/payments/${id}`,
+      }),
+      providesTags: [RtkqTagEnum.TRANSACTIONS],
+    }),
   }),
   overrideExisting: false,
 });
