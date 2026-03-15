@@ -15,60 +15,133 @@ import { TABLE_ROW_TYPE } from "@/constants/enums";
 import { useQuery } from "@/hooks/useQuery";
 import TableSkeletonLoader from "@/common/Table/TableSkeletonLoader";
 import TableEmpty from "@/common/Table/TableEmpty";
-import { User } from "@/types/user";
 import LoadingContent from "@/common/LoadingContent/LoadingContent";
 import useExtendedSnackbar from "@/hooks/useExtendedSnackbar";
 import TableError from "@/common/Table/TableError";
 import { exportToCSV } from "@/helpers/exportToCSV";
 import { PAGINATION_DEFAULT } from "@/constants/AppConstants";
+import { useLocation, useNavigate } from "react-router-dom";
+import TransactionDetailModal from "./TransactionDetailModal";
+
+const DEFAULT_TRANSACTION_SORTING: SortingState = [
+  { id: "createdAt", desc: true },
+];
+
+const parsePositiveInteger = (value: string | null, fallback: number) => {
+  const parsedValue = Number(value);
+
+  return Number.isInteger(parsedValue) && parsedValue > 0
+    ? parsedValue
+    : fallback;
+};
+
+const parseTransactionSorting = (value: string | null): SortingState => {
+  if (!value) {
+    return DEFAULT_TRANSACTION_SORTING;
+  }
+
+  const [id, direction] = value.split(",");
+
+  if (!id) {
+    return DEFAULT_TRANSACTION_SORTING;
+  }
+
+  return [{ id, desc: direction !== "asc" }];
+};
 
 const TransactionTable = () => {
   const query = useQuery();
+  const location = useLocation();
+  const navigate = useNavigate();
   const { showErrorSnackbar } = useExtendedSnackbar();
+  const defaultSorting = parseTransactionSorting(query.get("sort"));
+  const defaultPageIndex =
+    parsePositiveInteger(query.get("page"), PAGINATION_DEFAULT.page) - 1;
+  const defaultPageSize = parsePositiveInteger(
+    query.get("limit"),
+    PAGINATION_DEFAULT.limit
+  );
+  const defaultGlobalFilter = query.get("q") || "";
+  const defaultIsDeleted = query.get("isDeleted") === "true";
+  const defaultIsRequestDelete = query.get("isRequestDelete") === "true";
 
   const columns: ColumnDef<any, any>[] = [
     { accessorKey: "id", header: "Transaction Id" },
-    { accessorKey: "userId", header: "User Id" },
+    {
+      accessorKey: "customerName",
+      header: "Customer",
+      enableSorting: false,
+    },
     { accessorKey: "amount", header: "Amount" },
     { accessorKey: "currency", header: "Currency" },
-    { accessorKey: "gateway", header: "Gateway" },
+    { accessorKey: "gateway", header: "Gateway", enableSorting: false },
     { accessorKey: "status", header: "Status" },
-    { accessorKey: "conversionRate", header: "Conversion Rate" },
-    { accessorKey: "reference", header: "Reference code" },
+    {
+      accessorKey: "paymentOption",
+      header: "Payment Plan",
+      enableSorting: false,
+    },
+    { accessorKey: "orderId", header: "Order Id", enableSorting: false },
+    { accessorKey: "reference", header: "Backend Ref" },
     { accessorKey: "createdAt", header: "Created On" },
     { accessorKey: "updatedAt", header: "Last Updated On" },
   ];
 
   // Custom renderHeader function
-  const renderHeader = (headerGroup: HeaderGroup<User>) => (
+  const renderHeader = (headerGroup: HeaderGroup<any>) => (
     <>
-      {headerGroup.headers.map((header) => (
-        <th key={header.id} className="py-3 font-medium p-6">
-          <div
-            {...{
-              onClick: header.column.getToggleSortingHandler(),
-              style: { cursor: "pointer" },
-            }}
-          >
-            {flexRender(header.column.columnDef.header, header.getContext())}
-            {header.column.getIsSorted()
-              ? header.column.getIsSorted() === "desc"
-                ? " ▼"
-                : " ▲"
-              : null}
-          </div>
-        </th>
-      ))}
+      {headerGroup.headers.map((header) => {
+        const canSort = header.column.getCanSort();
+
+        return (
+          <th key={header.id} className="py-3 font-medium p-6">
+            <div
+              {...{
+                onClick: canSort
+                  ? header.column.getToggleSortingHandler()
+                  : undefined,
+                style: { cursor: canSort ? "pointer" : "default" },
+              }}
+            >
+              {flexRender(header.column.columnDef.header, header.getContext())}
+              {header.column.getIsSorted()
+                ? header.column.getIsSorted() === "desc"
+                  ? " ▼"
+                  : " ▲"
+                : null}
+            </div>
+          </th>
+        );
+      })}
     </>
   );
 
   // Custom renderRow function
-  const renderRow = (row: Row<User>) => (
+  const renderRow = (row: Row<any>) => (
     <tr
       key={row.id}
-      className="py-5 btransaction-b-1 btransaction-[#EAECF0] hover:bg-[#F3F4F7]"
+      className="cursor-pointer py-5 border-b-1 border-[#EAECF0] hover:bg-[#F3F4F7]"
+      onClick={() => {
+        setSelectedTransactionId(row.original.id);
+        setIsTransactionDetailOpen(true);
+      }}
     >
       {row.getVisibleCells().map((cell) => {
+        if (cell.column.id === "customerName") {
+          return (
+            <td key={cell.id} className="py-4 p-6">
+              <div className="space-y-1">
+                <p className="font-crimson text-sm font-bold text-[#101828] capitalize">
+                  {cell.row.original.customerName || "Guest customer"}
+                </p>
+                <p className="font-inter text-xs text-[#667085]">
+                  {cell.row.original.customerEmail || cell.row.original.userId || "N/A"}
+                </p>
+              </div>
+            </td>
+          );
+        }
+
         // Amount
         if (cell.column.id === "amount") {
           return (
@@ -101,6 +174,26 @@ const TransactionTable = () => {
                 value={cell.row.original}
                 type={TABLE_ROW_TYPE.TRANSACTION_STATUS}
               />
+            </td>
+          );
+        }
+
+        if (cell.column.id === "paymentOption") {
+          return (
+            <td key={cell.id} className="py-4 p-6">
+              <p className="font-inter text-sm font-medium text-[#101828]">
+                {cell.row.original.paymentOption || "N/A"}
+              </p>
+            </td>
+          );
+        }
+
+        if (cell.column.id === "orderId") {
+          return (
+            <td key={cell.id} className="py-4 p-6">
+              <p className="font-inter text-sm font-medium text-[#101828]">
+                {cell.row.original.orderId || "N/A"}
+              </p>
             </td>
           );
         }
@@ -144,16 +237,23 @@ const TransactionTable = () => {
     </tr>
   );
 
-  const [pageIndex, setPageIndex] = useState(PAGINATION_DEFAULT.page);
-  const [pageSize, setPageSize] = useState(PAGINATION_DEFAULT.limit);
-  const [sorting, setSorting] = useState<SortingState>([]);
-  const [globalFilter, setGlobalFilter] = useState("");
+  const [pageIndex, setPageIndex] = useState(defaultPageIndex);
+  const [pageSize, setPageSize] = useState(defaultPageSize);
+  const [sorting, setSorting] = useState<SortingState>(defaultSorting);
+  const [globalFilter, setGlobalFilter] = useState(defaultGlobalFilter);
+  const [selectedTransactionId, setSelectedTransactionId] = useState<string | null>(
+    null
+  );
+  const [isTransactionDetailOpen, setIsTransactionDetailOpen] =
+    useState(false);
   const transactionStatus = query.get("tab") || "";
 
   // State for filters
-  const [isDeleted, setIsDeleted] = useState<boolean | undefined>(false);
+  const [isDeleted, setIsDeleted] = useState<boolean | undefined>(
+    defaultIsDeleted
+  );
   const [isRequestDelete, setIsRequestDelete] = useState<boolean | undefined>(
-    false
+    defaultIsRequestDelete
   );
 
   // Fetch the transactions using your actual API
@@ -189,7 +289,7 @@ const TransactionTable = () => {
     return isDeletedMatch && requestDeleteMatch;
   });
 
-  const totalItems = transactionsResponse?.data?.count;
+  const totalItems = transactionsResponse?.data?.count || 0;
   const pageCount = Math.ceil(totalItems / pageSize);
 
   const fetchData = (
@@ -207,8 +307,74 @@ const TransactionTable = () => {
   };
 
   useEffect(() => {
-    fetchData(pageIndex, pageSize, sorting, globalFilter);
-  }, [pageIndex, pageSize, sorting, globalFilter, isDeleted, isRequestDelete]);
+    const params = new URLSearchParams(location.search);
+    const sortingValue = sorting?.length
+      ? `${sorting[0].id},${sorting[0].desc ? "desc" : "asc"}`
+      : "";
+    const isDefaultSorting =
+      sortingValue === `${DEFAULT_TRANSACTION_SORTING[0].id},${
+        DEFAULT_TRANSACTION_SORTING[0].desc ? "desc" : "asc"
+      }`;
+
+    if (pageIndex > 0) {
+      params.set("page", String(pageIndex + 1));
+    } else {
+      params.delete("page");
+    }
+
+    if (pageSize !== PAGINATION_DEFAULT.limit) {
+      params.set("limit", String(pageSize));
+    } else {
+      params.delete("limit");
+    }
+
+    if (globalFilter) {
+      params.set("q", globalFilter);
+    } else {
+      params.delete("q");
+    }
+
+    if (sortingValue && !isDefaultSorting) {
+      params.set("sort", sortingValue);
+    } else {
+      params.delete("sort");
+    }
+
+    if (isDeleted) {
+      params.set("isDeleted", "true");
+    } else {
+      params.delete("isDeleted");
+    }
+
+    if (isRequestDelete) {
+      params.set("isRequestDelete", "true");
+    } else {
+      params.delete("isRequestDelete");
+    }
+
+    const nextSearch = params.toString();
+    const currentSearch = location.search.replace(/^\?/, "");
+
+    if (nextSearch !== currentSearch) {
+      navigate(
+        {
+          pathname: location.pathname,
+          search: nextSearch,
+        },
+        { replace: true }
+      );
+    }
+  }, [
+    globalFilter,
+    isDeleted,
+    isRequestDelete,
+    location.pathname,
+    location.search,
+    navigate,
+    pageIndex,
+    pageSize,
+    sorting,
+  ]);
 
   if (isError) {
     showErrorSnackbar(error?.message || "Error occured");
@@ -261,6 +427,10 @@ const TransactionTable = () => {
           columns={columns}
           data={filteredTransactions}
           pageCount={pageCount}
+          defaultSorting={defaultSorting}
+          defaultGlobalFilter={defaultGlobalFilter}
+          defaultPageIndex={defaultPageIndex}
+          defaultPageSize={defaultPageSize}
           fetchData={fetchData}
           PaginationComponent={Pagination}
           SearchComponent={Search}
@@ -289,6 +459,15 @@ const TransactionTable = () => {
           renderRow={renderRow}
         />
       </LoadingContent>
+
+      <TransactionDetailModal
+        open={isTransactionDetailOpen}
+        transactionId={selectedTransactionId}
+        onClose={() => {
+          setIsTransactionDetailOpen(false);
+          setSelectedTransactionId(null);
+        }}
+      />
     </>
   );
 };
