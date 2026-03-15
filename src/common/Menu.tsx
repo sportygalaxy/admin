@@ -6,7 +6,6 @@ import MenuItem from "@mui/material/MenuItem";
 import Divider from "@mui/material/Divider";
 import { Menu, MenuProps } from "@mui/material";
 import { ChevronDown } from "@untitled-ui/icons-react";
-import UserImage from "@/assets/images/user.jpeg";
 import useLogout from "@/hooks/useLogout";
 import useAuthUser from "@/hooks/useAuthUser";
 
@@ -27,9 +26,9 @@ const StyledMenu = styled((props: MenuProps) => (
   "& .MuiPaper-root": {
     borderRadius: 6,
     marginTop: theme.spacing(0.5),
-    minWidth: 180,
+    minWidth: 220,
     color: theme.palette.grey[900],
-    backgroundColor: alpha(theme.palette.grey[100], 1),
+    backgroundColor: alpha(theme.palette.grey[200], 1),
     // boxShadow:
     //   "rgb(255, 255, 255) 0px 0px 0px 0px, rgba(0, 0, 0, 0.05) 0px 0px 0px 1px, rgba(0, 0, 0, 0.1) 0px 10px 15px -3px, rgba(0, 0, 0, 0.05) 0px 4px 6px -2px",
     "& .MuiMenu-list": {
@@ -64,7 +63,7 @@ export default function MenuDropdown() {
     <div>
       <Button
         id="demo-customized-button"
-        className="px-5 py-3 m-0 min-w-[300px]"
+        className="px-5 py-3 m-0"
         size="large"
         aria-controls={open ? "demo-customized-menu" : undefined}
         aria-haspopup="true"
@@ -75,16 +74,11 @@ export default function MenuDropdown() {
         endIcon={<ChevronDown />}
       >
         <div className="flex items-center justify-center gap-3">
-          <img
-            src={user?.avatar || UserImage}
-            alt="User-image"
-            className="w-12 h-12 rounded-full"
-          />
           <div className="flex flex-col items-start pr-4 leading-snug">
-            <p className="capitalize font-inter font-bold text-base line-clamp-1">
+            <p className="text-base font-bold capitalize font-inter line-clamp-1">
               {user?.firstName} {user?.lastName}
             </p>
-            <p className="lowercase font-inter font-medium text-xs line-clamp-1">
+            <p className="text-xs font-medium lowercase font-inter line-clamp-1">
               {user?.email}
             </p>
           </div>

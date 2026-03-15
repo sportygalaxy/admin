@@ -5,6 +5,7 @@ import AppProtectedHeader from "@/AppProtectedHeader";
 import { Box } from "@mui/material";
 import theme from "../../../../mui.config";
 import useAuthUser from "@/hooks/useAuthUser";
+import { isAdminRole } from "@/constants/roles";
 
 function PublicRoutesLayout() {
   const location = useLocation();
@@ -17,9 +18,11 @@ function PublicRoutesLayout() {
     "/"
   );
 
-  if (user && isRoot) return <Navigate to={routeEnum.DASHBOARD} replace />;
+  if (user && isAdminRole(user?.role) && isRoot) {
+    return <Navigate to={routeEnum.DASHBOARD} replace />;
+  }
 
-  if (user) {
+  if (user && isAdminRole(user?.role)) {
     return (
       <Navigate
         state={{ prevLocation: location }}

@@ -9,6 +9,7 @@ import {
   PublicRoutesLayout,
 } from "@/pages/Layout/layout/Layout";
 import { routeEnum } from "@/constants/RouteConstants";
+import { ROLE_MANAGEMENT_ACCESS_ROLES } from "@/constants/roles";
 import Review from "@/pages/Review/Review";
 
 const Home = lazy(() => import("@/pages/Home/Home"));
@@ -32,6 +33,9 @@ const EmployeeProfile = lazy(
 );
 
 const Transaction = lazy(() => import("@/pages/Transaction/Transaction"));
+const UserRoleManagement = lazy(
+  () => import("@/pages/UserRole/UserRole")
+);
 
 const AuthLogin = lazy(() => import("@/pages/Auth/AuthLogin"));
 
@@ -136,6 +140,16 @@ export const ProtectedRoutes: ExtendedRouteObject[] = [
       {
         path: routeEnum.USERS_EMPLOYEES,
         element: <Employee />,
+        errorElement: <ErrorBoundaryRoot />,
+      },
+      {
+        path: routeEnum.USERS_ROLES,
+        element: (
+          <AuthGuard
+            route={{ allowedRoles: ROLE_MANAGEMENT_ACCESS_ROLES }}
+            component={<UserRoleManagement />}
+          />
+        ),
         errorElement: <ErrorBoundaryRoot />,
       },
       {

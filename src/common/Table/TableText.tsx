@@ -186,11 +186,11 @@ const TableText: FC<TableTextProps> = ({ type, value }) => {
   if (type === TABLE_ROW_TYPE.CLIENT_NAME) {
     return (
       <div className="flex items-center gap-2">
-        <Avatar
+        {/* <Avatar
           src={value?.avatar}
           alt={value?.firstName}
           className="w-20 h-20 rounded-md"
-        />
+        /> */}
         <div>
           <Typography
             color="grey.900"

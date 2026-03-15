@@ -23,6 +23,7 @@ import useExtendedSnackbar from "@/hooks/useExtendedSnackbar";
 import TableError from "@/common/Table/TableError";
 import { exportToCSV } from "@/helpers/exportToCSV";
 import { PAGINATION_DEFAULT } from "@/constants/AppConstants";
+import UserRoleBadge from "@/common/UserRoleBadge";
 
 const EmployeeTable = () => {
   const query = useQuery();
@@ -37,10 +38,11 @@ const EmployeeTable = () => {
   };
 
    const columns: ColumnDef<any, any>[] = [
-     { accessorKey: "name", header: "Employee's Name" },
+     { accessorKey: "name", header: "Team Member's Name" },
      // { accessorKey: "id", header: "ID" },
      { accessorKey: "phone", header: "Phone" },
      { accessorKey: "email", header: "Email" },
+     { accessorKey: "role", header: "Role" },
      { accessorKey: "address", header: "Address" },
      { accessorKey: "isVerified", header: "Account Verified" },
      { accessorKey: "isDeleted", header: "Account Deleted" },
@@ -120,6 +122,18 @@ const EmployeeTable = () => {
                 value={cell.row.original}
                 type={TABLE_ROW_TYPE.CLIENT_ACCOUNT_DELETED}
               />
+            </td>
+          );
+        }
+
+        if (cell.column.id === "role") {
+          return (
+            <td
+              key={cell.id}
+              onClick={() => handleGotoProfile(cell.row.original.id)}
+              className="py-4 p-6"
+            >
+              <UserRoleBadge role={cell.row.original.role} />
             </td>
           );
         }

@@ -3,18 +3,19 @@ import { Navigate, useLocation } from "react-router-dom";
 
 import { routeEnum } from "@/constants/RouteConstants";
 import useAuthUser from "@/hooks/useAuthUser";
+import { isAdminRole, type UserRole } from "@/constants/roles";
 
 interface AuthGuardProps {
   component: ReactElement;
-  route: any;
+  route?: any;
 }
 
 // PS: This can be extended as we see fit
-function AuthGuard({ component }: AuthGuardProps): ReactElement {
+function AuthGuard({ component, route }: AuthGuardProps): ReactElement {
   const location = useLocation();
 
   const user = useAuthUser();
-  const isAuthorized = !!user?.token;
+  const isAuthorized = !!user?.token && isAdminRole(user?.role);
 
   if (!isAuthorized) {
     return (
@@ -24,6 +25,13 @@ function AuthGuard({ component }: AuthGuardProps): ReactElement {
         replace
       />
     );
+  }
+
+  if (
+    route?.allowedRoles?.length &&
+    !route.allowedRoles.includes(user.role as UserRole)
+  ) {
+    return <Navigate to={routeEnum.DASHBOARD} replace />;
   }
 
   return component;

@@ -21,6 +21,11 @@ import {
   Users01,
 } from "@untitled-ui/icons-react";
 import useLogout from "./hooks/useLogout";
+import useAuthUser from "./hooks/useAuthUser";
+import {
+  ROLE_MANAGEMENT_ACCESS_ROLES,
+  type UserRole,
+} from "./constants/roles";
 
 type Props = {
   className?: string;
@@ -75,48 +80,6 @@ const BOTTOM_LINKS: LinkType[] = [
     title: "Log out",
     icon: <LogOut01 />,
     path: null,
-  },
-];
-
-const ACCORDION_LINKS: AccordionLinkType[] = [
-  {
-    title: "Products",
-    icon: <SearchLg color="black" />,
-    subLinks: [
-      {
-        title: "Products",
-        icon: <></>,
-        path: routeEnum.PRODUCTS,
-      },
-      {
-        title: "Colors",
-        icon: <></>,
-        path: routeEnum.PRODUCT_COLORS,
-      },
-      {
-        title: "Sizes",
-        icon: <></>,
-        path: routeEnum.PRODUCT_SIZES,
-      },
-    ],
-    isAccordion: true,
-  },
-  {
-    title: "Users",
-    icon: <Users01 color="black" />,
-    subLinks: [
-      {
-        title: "Clients",
-        icon: <></>,
-        path: routeEnum.USERS_CLIENTS,
-      },
-      {
-        title: "Employees",
-        icon: <></>,
-        path: routeEnum.USERS_EMPLOYEES,
-      },
-    ],
-    isAccordion: true,
   },
 ];
 
@@ -209,6 +172,58 @@ const NavAccordion = ({ title, icon, subLinks }: AccordionLinkType) => {
 };
 
 const AppProtectedSideMenu: React.FC<Props> = ({ className = "" }) => {
+  const user = useAuthUser();
+  const isRoleManager = ROLE_MANAGEMENT_ACCESS_ROLES.includes(
+    user?.role as UserRole
+  );
+  const userAccordionLinks: LinkType[] = [
+    {
+      title: "Users",
+      icon: <></>,
+      path: routeEnum.USERS_CLIENTS,
+    },
+    ...(isRoleManager
+      ? [
+          {
+            title: "Roles",
+            icon: <></>,
+            path: routeEnum.USERS_ROLES,
+          },
+        ]
+      : []),
+  ];
+
+  const ACCORDION_LINKS: AccordionLinkType[] = [
+    {
+      title: "Products",
+      icon: <SearchLg color="black" />,
+      subLinks: [
+        {
+          title: "Products",
+          icon: <></>,
+          path: routeEnum.PRODUCTS,
+        },
+        {
+          title: "Colors",
+          icon: <></>,
+          path: routeEnum.PRODUCT_COLORS,
+        },
+        {
+          title: "Sizes",
+          icon: <></>,
+          path: routeEnum.PRODUCT_SIZES,
+        },
+      ],
+      isAccordion: true,
+    },
+    {
+      title: "Users",
+      icon: <Users01 color="black" />,
+      subLinks: userAccordionLinks,
+      isAccordion: true,
+    },
+  ];
+
   // Combine normal links and accordion links
   const COMBINED_LINKS: CombinedLinkType[] = [
     ...NORMAL_LINKS.slice(0, 1), // "Dashboard"
