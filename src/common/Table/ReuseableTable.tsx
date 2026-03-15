@@ -20,6 +20,10 @@ interface ReusableTableProps<TData> {
   columns: ColumnDef<TData, any>[];
   data: TData[];
   pageCount: number;
+  defaultSorting?: SortingState;
+  defaultGlobalFilter?: string;
+  defaultPageIndex?: number;
+  defaultPageSize?: number;
   fetchData: (
     pageIndex: number,
     pageSize: number,
@@ -44,6 +48,10 @@ const ReusableTable = <TData,>({
   columns,
   data,
   pageCount,
+  defaultSorting,
+  defaultGlobalFilter,
+  defaultPageIndex,
+  defaultPageSize,
   fetchData,
   PaginationComponent,
   SearchComponent,
@@ -52,11 +60,11 @@ const ReusableTable = <TData,>({
   renderHeader,
   renderRow,
 }: ReusableTableProps<TData>) => {
-  const [sorting, setSorting] = useState<SortingState>([]);
-  const [globalFilter, setGlobalFilter] = useState("");
+  const [sorting, setSorting] = useState<SortingState>(defaultSorting ?? []);
+  const [globalFilter, setGlobalFilter] = useState(defaultGlobalFilter ?? "");
   const [{ pageIndex, pageSize }, setPagination] = useState<PaginationState>({
-    pageIndex: PAGINATION_DEFAULT.page,
-    pageSize: PAGINATION_DEFAULT.limit,
+    pageIndex: defaultPageIndex ?? PAGINATION_DEFAULT.page,
+    pageSize: defaultPageSize ?? PAGINATION_DEFAULT.limit,
   });
 
   const table = useReactTable({

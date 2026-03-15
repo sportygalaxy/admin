@@ -102,7 +102,7 @@ const TransactionDetailModal: FC<TransactionDetailModalProps> = ({
             <SportygalaxyLoadingIndicator />
           </div>
         ) : isError ? (
-          <div className="space-y-4 py-10 text-center">
+          <div className="py-10 space-y-4 text-center">
             <Typography className="font-inter text-base text-[#475467]">
               Unable to load transaction details.
             </Typography>
@@ -130,21 +130,21 @@ const TransactionDetailModal: FC<TransactionDetailModalProps> = ({
                 {transaction.paymentOption ? (
                   <Chip
                     label={transaction.paymentOption}
-                    className="font-inter font-semibold"
+                    className="font-semibold font-inter"
                     variant="outlined"
                   />
                 ) : null}
                 {transaction.paymentGateway?.name ? (
                   <Chip
                     label={transaction.paymentGateway.name}
-                    className="font-inter font-semibold capitalize"
+                    className="font-semibold capitalize font-inter"
                     variant="outlined"
                   />
                 ) : null}
                 {transaction.orderId ? (
                   <Chip
                     label={`Order linked`}
-                    className="font-inter font-semibold"
+                    className="font-semibold font-inter"
                     color="success"
                     variant="outlined"
                   />
@@ -169,7 +169,9 @@ const TransactionDetailModal: FC<TransactionDetailModalProps> = ({
                 {renderRow("Gateway Ref", transaction.gatewayReference)}
                 {renderRow(
                   "Verified At",
-                  transaction.verifiedAt ? transformDate(transaction.verifiedAt) : "N/A"
+                  transaction.verifiedAt
+                    ? transformDate(transaction.verifiedAt)
+                    : "N/A"
                 )}
                 {renderRow("Created", transformDate(transaction.createdAt))}
                 {renderRow("Updated", transformDate(transaction.updatedAt))}
@@ -202,7 +204,8 @@ const TransactionDetailModal: FC<TransactionDetailModalProps> = ({
                 {renderRow("Creation Error", transaction.orderCreationError)}
                 {renderRow(
                   "Payment Plan",
-                  transaction.linkedOrder?.paymentOption || transaction.paymentOption
+                  transaction.linkedOrder?.paymentOption ||
+                    transaction.paymentOption
                 )}
                 {renderRow(
                   "Order Total",
@@ -250,8 +253,8 @@ const TransactionDetailModal: FC<TransactionDetailModalProps> = ({
                             SKU: {item.product?.modelNumber || "N/A"}
                           </Typography>
                           <Typography className="mt-1 font-inter text-xs text-[#667085]">
-                            Qty: {item.quantity} | Size: {item.size || "N/A"} | Color:{" "}
-                            {item.color || "N/A"}
+                            Qty: {item.quantity} | Size: {item.size || "N/A"} |
+                            Color: {item.color || "N/A"}
                           </Typography>
                         </div>
                       </Fragment>
@@ -280,11 +283,12 @@ const TransactionDetailModal: FC<TransactionDetailModalProps> = ({
             to={orderRoute}
             variant="outlined"
             onClick={onClose}
+            className="capitalize"
           >
             Open Linked Order
           </Button>
         ) : null}
-        <Button variant="contained" onClick={onClose}>
+        <Button className="capitalize" variant="contained" onClick={onClose}>
           Close
         </Button>
       </DialogActions>
