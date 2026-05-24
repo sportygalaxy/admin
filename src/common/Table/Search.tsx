@@ -10,7 +10,7 @@ const Search: FC<{
     <TextField
       value={globalFilter}
       onChange={(e) => setGlobalFilter(e.target.value)}
-      className="MuiTextFieldOutlined--plain max-w-[480px] mr-auto"
+      className="MuiTextFieldOutlined--plain !w-full md:!max-w-[480px] md:mr-auto"
       placeholder="Search by Name, ID and others..."
       fullWidth
       InputProps={{

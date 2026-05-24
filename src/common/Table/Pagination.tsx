@@ -51,11 +51,11 @@ export const Pagination: FC<{
   return (
     <div className="mt-8">
       <Divider />
-      <div className="flex items-center justify-between py-4">
+      <div className="flex flex-col gap-4 py-4 md:grid md:grid-cols-[auto_1fr_auto] md:items-center md:gap-6">
         <Button
           variant="ghost"
           startIcon={<ArrowLeft width={20} height={20} />}
-          className="capitalize font-bold font-inter"
+          className="w-full justify-center capitalize font-bold font-inter md:w-auto md:justify-start"
           size="small"
           onClick={handlePrevious}
           disabled={!table.getCanPreviousPage()}
@@ -63,20 +63,23 @@ export const Pagination: FC<{
           Previous
         </Button>
 
-        <div className="flex items-center gap-1">
-          Page
-          <span className="font-medium text-sm font-inter text-[#039855] bg-[#ECFDF3] w-10 h-10 flex items-center justify-center rounded-full p-4">
-            {currentPage}
-          </span>
-          of
-          <span className="font-medium text-sm font-inter text-[#667085] w-10 h-10 flex items-center justify-center rounded-full p-4">
-            {totalPages}
-          </span>
-          <FormControl>
+        <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-center">
+          <div className="flex flex-wrap items-center justify-center gap-2 text-sm text-[#667085]">
+            <span>Page</span>
+            <span className="flex h-10 w-10 items-center justify-center rounded-full bg-[#ECFDF3] p-4 text-sm font-medium font-inter text-[#039855]">
+              {currentPage}
+            </span>
+            <span>of</span>
+            <span className="flex h-10 w-10 items-center justify-center rounded-full p-4 text-sm font-medium font-inter text-[#667085]">
+              {totalPages}
+            </span>
+          </div>
+
+          <FormControl className="w-full md:min-w-[140px] md:w-auto">
             <InputLabel id="select-label"></InputLabel>
             <Select
               size="small"
-              className="text-primary-main font-inter font-bold text-sm"
+              className="w-full text-primary-main font-inter font-bold text-sm md:w-auto"
               labelId="select-label"
               value={table.getState().pagination.pageSize}
               onChange={(e) => setPageSize(Number(e.target.value))}
@@ -95,7 +98,7 @@ export const Pagination: FC<{
         <Button
           variant="ghost"
           endIcon={<ArrowRight width={20} height={20} />}
-          className="capitalize font-bold font-inter"
+          className="w-full justify-center capitalize font-bold font-inter md:w-auto md:justify-end"
           size="small"
           onClick={handleNext}
           disabled={!table.getCanNextPage()}

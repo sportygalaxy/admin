@@ -199,7 +199,7 @@ const TableText: FC<TableTextProps> = ({ type, value }) => {
             {value?.firstName} {value?.lastName}
           </Typography>
           <div className="flex items-center space-x-1">
-            <Calendar color="#027A48" width={18} height={18} />
+            <Calendar color="#027A48" width={10} height={10} />
             <Typography
               color="grey.600"
               className="text-xs font-thin capitalize font-inter"

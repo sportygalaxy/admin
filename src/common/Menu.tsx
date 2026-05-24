@@ -63,7 +63,7 @@ export default function MenuDropdown() {
     <div>
       <Button
         id="demo-customized-button"
-        className="px-5 py-3 m-0"
+        className="m-0 !min-w-0 !rounded-xl !px-2 !py-2 sm:!px-4 sm:!py-3"
         size="large"
         aria-controls={open ? "demo-customized-menu" : undefined}
         aria-haspopup="true"
@@ -74,11 +74,11 @@ export default function MenuDropdown() {
         endIcon={<ChevronDown />}
       >
         <div className="flex items-center justify-center gap-3">
-          <div className="flex flex-col items-start pr-4 leading-snug">
+          <div className="flex flex-col items-start leading-snug sm:pr-2">
             <p className="text-base font-bold capitalize font-inter line-clamp-1">
               {user?.firstName} {user?.lastName}
             </p>
-            <p className="text-xs font-medium lowercase font-inter line-clamp-1">
+            <p className="hidden text-xs font-medium lowercase font-inter line-clamp-1 sm:block">
               {user?.email}
             </p>
           </div>

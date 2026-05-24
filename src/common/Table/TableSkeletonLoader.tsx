@@ -2,7 +2,7 @@ import { FC } from "react";
 
 const TableSkeletonLoader: FC = () => {
   return (
-    <div className="mt-10">
+    <div className="table-mobile-scroll mt-10">
       <table className="w-full text-left">
         <thead className="bg-[#F2F4F7] text-[#667085] text-xs border-b-1 border-[#F9FAFB]">
           <tr>

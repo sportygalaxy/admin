@@ -94,40 +94,44 @@ const ReusableTable = <TData,>({
 
   return (
     <>
-      <div className="flex items-center gap-3 mt-4">
-        {SearchComponent ? (
-          <SearchComponent
-            globalFilter={globalFilter}
-            setGlobalFilter={setGlobalFilter}
-          />
-        ) : (
-          <input
-            value={globalFilter ?? ""}
-            onChange={(e) => setGlobalFilter(e.target.value)}
-            placeholder="Search..."
-            className="border p-2 rounded"
-          />
-        )}
+      <div className="table-toolbar">
+        <div className="table-toolbar-search">
+          {SearchComponent ? (
+            <SearchComponent
+              globalFilter={globalFilter}
+              setGlobalFilter={setGlobalFilter}
+            />
+          ) : (
+            <input
+              value={globalFilter ?? ""}
+              onChange={(e) => setGlobalFilter(e.target.value)}
+              placeholder="Search..."
+              className="w-full rounded border p-2"
+            />
+          )}
+        </div>
 
-        {FilterComponent ? (
-          FilterComponent
-        ) : (
-          <>
-            <Button
-              variant="ghost"
-              startIcon={<FilterLines width={20} height={20} />}
-              className="capitalize font-bold font-inter"
-              size="medium"
-            >
-              Filter
-            </Button>
-          </>
-        )}
+        {FilterComponent || ExportComponent ? (
+          <div className="table-toolbar-actions">
+            {FilterComponent ? (
+              FilterComponent
+            ) : (
+              <Button
+                variant="ghost"
+                startIcon={<FilterLines width={20} height={20} />}
+                className="capitalize font-bold font-inter"
+                size="medium"
+              >
+                Filter
+              </Button>
+            )}
 
-        {ExportComponent}
+            {ExportComponent}
+          </div>
+        ) : null}
       </div>
 
-      <div className="mt-10">
+      <div className="table-mobile-scroll mt-10">
         <table className="w-full text-left">
           {/* table-fixed */}
           <thead className="bg-[#F2F4F7] text-[#667085] text-xs border-b-1 border-[#F9FAFB]">

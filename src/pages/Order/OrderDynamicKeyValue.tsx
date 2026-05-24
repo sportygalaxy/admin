@@ -52,7 +52,7 @@ const OrderDynamicKeyValue: React.FC<OrderDynamicKeyValueProps> = ({
   return (
     <div className="mb-6">
       <h2 className="mb-4 text-xl font-bold">{title}</h2>
-      <div className="overflow-x-auto">
+      <div className="table-mobile-scroll">
         <table className="min-w-full bg-white border-collapse rounded-lg shadow-md">
           <thead>
             <tr className="bg-gray-200">

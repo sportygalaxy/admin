@@ -354,30 +354,34 @@ const ClientTable = () => {
   return (
     <>
       {filteredClients.length <= 0 ? (
-        <div className="flex items-center gap-3 mt-4">
-          <Search
-            globalFilter={globalFilter}
-            setGlobalFilter={setGlobalFilter}
-          />
+        <div className="table-toolbar">
+          <div className="table-toolbar-search">
+            <Search
+              globalFilter={globalFilter}
+              setGlobalFilter={setGlobalFilter}
+            />
+          </div>
 
-          <Filter
-            isDeleted={isDeleted}
-            setIsDeleted={setIsDeleted}
-            isRequestDelete={isRequestDelete}
-            setIsRequestDelete={setIsRequestDelete}
-          />
+          <div className="table-toolbar-actions">
+            <Filter
+              isDeleted={isDeleted}
+              setIsDeleted={setIsDeleted}
+              isRequestDelete={isRequestDelete}
+              setIsRequestDelete={setIsRequestDelete}
+            />
 
-          <Button
-            variant="outlined"
-            startIcon={<Share01 width={20} height={20} />}
-            className="capitalize font-bold font-inter flex items-center justify-center"
-            size="medium"
-            onClick={handleExportCSV}
-          >
-            <Tooltip title="Download CSV">
-              <p>Export</p>
-            </Tooltip>
-          </Button>
+            <Button
+              variant="outlined"
+              startIcon={<Share01 width={20} height={20} />}
+              className="capitalize font-bold font-inter flex items-center justify-center"
+              size="medium"
+              onClick={handleExportCSV}
+            >
+              <Tooltip title="Download CSV">
+                <p>Export</p>
+              </Tooltip>
+            </Button>
+          </div>
         </div>
       ) : null}
 

@@ -74,7 +74,7 @@ const SizeTable: FC<SizeTableProps> = ({ onEdit }) => {
         data={filteredSizes}
         className="mt-6"
       >
-        <div className="bg-white rounded-xl shadow-none border border-[#EAECF0] overflow-hidden">
+        <div className="table-mobile-scroll rounded-xl border border-[#EAECF0] bg-white shadow-none">
           <table className="w-full text-left">
             <thead className="bg-[#F2F4F7] text-[#667085] text-xs border-b-1 border-[#F9FAFB]">
               <tr>
