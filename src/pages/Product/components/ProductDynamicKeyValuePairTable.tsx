@@ -9,7 +9,7 @@ const ProductDynamicKeyValuePairTable: React.FC<ProductDynamicKeyValuePairTableP
   return (
     <div className="mb-6">
       <h2 className="text-xl font-bold mb-4">{title}</h2>
-      <div className="overflow-x-auto">
+      <div className="table-mobile-scroll">
         <table className="min-w-full bg-white shadow-md rounded-lg border-collapse">
           <thead>
             <tr className="bg-gray-200">

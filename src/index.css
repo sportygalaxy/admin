@@ -47,6 +47,29 @@ body {
   table-layout: fixed;
 }
 
+.table-mobile-scroll {
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+}
+
+.table-mobile-scroll > table {
+  min-width: max-content;
+  width: 100%;
+}
+
+.table-toolbar {
+  @apply mt-4 flex flex-col gap-3 md:flex-row md:items-center;
+}
+
+.table-toolbar-search {
+  @apply w-full md:min-w-0 md:flex-1;
+}
+
+.table-toolbar-actions {
+  @apply flex w-full flex-wrap items-center gap-3 md:w-auto md:justify-end;
+}
+
 /* Loading styling */
 #loading-indicator {
   width: 10px;

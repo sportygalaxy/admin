@@ -186,11 +186,11 @@ const TableText: FC<TableTextProps> = ({ type, value }) => {
   if (type === TABLE_ROW_TYPE.CLIENT_NAME) {
     return (
       <div className="flex items-center gap-2">
-        <Avatar
+        {/* <Avatar
           src={value?.avatar}
           alt={value?.firstName}
           className="w-20 h-20 rounded-md"
-        />
+        /> */}
         <div>
           <Typography
             color="grey.900"
@@ -199,7 +199,7 @@ const TableText: FC<TableTextProps> = ({ type, value }) => {
             {value?.firstName} {value?.lastName}
           </Typography>
           <div className="flex items-center space-x-1">
-            <Calendar color="#027A48" width={18} height={18} />
+            <Calendar color="#027A48" width={10} height={10} />
             <Typography
               color="grey.600"
               className="text-xs font-thin capitalize font-inter"

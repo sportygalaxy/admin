@@ -69,31 +69,31 @@ const AuthLogin: FC<AuthLoginProps> = () => {
   );
 
   return (
-    <div className="relative h-screen flex flex-col items-center justify-start">
+    <div className="relative flex flex-col items-center justify-start h-screen">
       <div className="container-wrapper mt-20 w-full max-w-[700px] z-[1]">
         <img src={Logo} alt="logo" />
 
         <div className="mt-14">
           <Typography
             color="grey.900"
-            className="font-bold text-3xl font-crimson"
+            className="text-3xl font-bold font-crimson"
           >
-            Log in
+            Admin Sign In
           </Typography>
           <Typography
             color="grey.700"
-            className="font-normal text-sm font-inter"
+            className="text-sm font-normal font-inter"
           >
-            Welcome back! Please enter your details.
+            Sign in with an admin, staff, or super admin account.
           </Typography>
         </div>
 
-        <form onSubmit={formik.handleSubmit} className="space-y-5 mt-8">
+        <form onSubmit={formik.handleSubmit} className="mt-8 space-y-5">
           <div className="flex flex-col">
             <Typography
               color="grey.700"
               component="label"
-              className="font-medium text-sm font-inter"
+              className="text-sm font-medium font-inter"
               htmlFor="email"
             >
               Email
@@ -131,7 +131,7 @@ const AuthLogin: FC<AuthLoginProps> = () => {
             <Typography
               color="grey.700"
               component="label"
-              className="font-medium text-sm font-inter"
+              className="text-sm font-medium font-inter"
               htmlFor="password"
             >
               Password
@@ -199,7 +199,7 @@ const AuthLogin: FC<AuthLoginProps> = () => {
               />
               <Typography
                 color="grey.700"
-                className="font-medium text-xs sm:text-sm font-inter"
+                className="text-xs font-medium sm:text-sm font-inter"
               >
                 Remember for 30 days
               </Typography>
@@ -218,7 +218,7 @@ const AuthLogin: FC<AuthLoginProps> = () => {
               loading={loginResult.isLoading}
               fullWidth
               variant="contained"
-              className="capitalize font-bold font-inter text-base"
+              className="text-base font-bold capitalize font-inter"
               type="submit"
             >
               Sign in

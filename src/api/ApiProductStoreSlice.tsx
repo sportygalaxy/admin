@@ -24,19 +24,31 @@ export const ApiProductStoreSlice = sportygalaxyAdminApi.injectEndpoints({
         isDeleted,
         isRequestDelete,
       }) => {
-        let params = new URLSearchParams({
-          page: pageIndex, // Ensure 1-based index
-          limit: pageSize,
-          ...(globalFilter && { q: globalFilter }),
-          ...(productStatus && { q: productStatus }),
-          ...(isDeleted && { isDeleted }),
-          ...(isRequestDelete && { isRequestDelete }),
-          ...(sorting?.length && {
-            sort: `${sorting[0].id},${sorting[0].desc ? "desc" : "asc"}`,
-          }),
-        });
+        const params = new URLSearchParams();
 
-        // console.log("params", params.toString());
+        params.set("page", (pageIndex + 1).toString());
+        params.set("limit", pageSize.toString());
+
+        if (globalFilter) {
+          params.set("q", globalFilter);
+        }
+
+        if (productStatus) {
+          params.set("q", productStatus);
+        }
+
+        if (isDeleted) {
+          params.set("isDeleted", String(isDeleted));
+        }
+
+        if (isRequestDelete) {
+          params.set("isRequestDelete", String(isRequestDelete));
+        }
+
+        if (sorting?.length) {
+          const { id, desc } = sorting[0];
+          params.set("sort", `${id},${desc ? "desc" : "asc"}`);
+        }
 
         return {
           url: `/admin-products?${params.toString()}`,

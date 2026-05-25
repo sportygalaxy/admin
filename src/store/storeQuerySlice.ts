@@ -12,7 +12,7 @@ export const sportygalaxyAdminApi = createApi({
   endpoints: (builder) => ({
     login: builder.mutation<LoginResponse, LoginRequest>({
       query: ({ ...data }: LoginRequest) => ({
-        url: "/auth/login",
+        url: "/auth/admin/login",
         data,
         method: "POST",
       }),

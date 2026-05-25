@@ -9,7 +9,7 @@ import Search from "@/common/Table/Search";
 
 import Filter from "@/common/Table/Filter";
 
-import { generatePath, useNavigate } from "react-router-dom";
+import { generatePath, useLocation, useNavigate } from "react-router-dom";
 import { routeEnum } from "@/constants/RouteConstants";
 import TableText from "@/common/Table/TableText";
 import { ApiClientStoreSlice } from "@/api/ApiClientStoreSlice";
@@ -23,24 +23,67 @@ import useExtendedSnackbar from "@/hooks/useExtendedSnackbar";
 import TableError from "@/common/Table/TableError";
 import { exportToCSV } from "@/helpers/exportToCSV";
 import { PAGINATION_DEFAULT } from "@/constants/AppConstants";
+import UserRoleBadge from "@/common/UserRoleBadge";
+import { TEAM_ROLES, type UserRole } from "@/constants/roles";
+
+const DEFAULT_CLIENT_SORTING: SortingState = [{ id: "createdAt", desc: true }];
+
+const parsePositiveInteger = (value: string | null, fallback: number) => {
+  const parsedValue = Number(value);
+
+  return Number.isInteger(parsedValue) && parsedValue > 0
+    ? parsedValue
+    : fallback;
+};
+
+const parseClientSorting = (value: string | null): SortingState => {
+  if (!value) {
+    return DEFAULT_CLIENT_SORTING;
+  }
+
+  const [id, direction] = value.split(",");
+
+  if (!id) {
+    return DEFAULT_CLIENT_SORTING;
+  }
+
+  return [{ id, desc: direction !== "asc" }];
+};
 
 const ClientTable = () => {
   const query = useQuery();
+  const location = useLocation();
   const { showErrorSnackbar } = useExtendedSnackbar();
   const navigate = useNavigate();
+  const defaultSorting = parseClientSorting(query.get("sort"));
+  const defaultPageIndex =
+    parsePositiveInteger(query.get("page"), PAGINATION_DEFAULT.page) - 1;
+  const defaultPageSize = parsePositiveInteger(
+    query.get("limit"),
+    PAGINATION_DEFAULT.limit
+  );
+  const defaultGlobalFilter = query.get("q") || "";
+  const defaultIsDeleted = query.get("isDeleted") === "true";
+  const defaultIsRequestDelete = query.get("isRequestDelete") === "true";
 
-  const handleGotoProfile = (id: string) => {
-    const route = generatePath(routeEnum.USERS_CLIENT_DETAILS, {
-      id,
-    });
+  const handleGotoProfile = (id: string, role?: UserRole) => {
+    const route = generatePath(
+      TEAM_ROLES.includes((role || "USER") as UserRole)
+        ? routeEnum.USERS_EMPLOYEE_DETAILS
+        : routeEnum.USERS_CLIENT_DETAILS,
+      {
+        id,
+      }
+    );
     navigate(route);
   };
 
   const columns: ColumnDef<any, any>[] = [
-    { accessorKey: "name", header: "Client's Name" },
+    { accessorKey: "name", header: "User's Name" },
     // { accessorKey: "id", header: "ID" },
     { accessorKey: "phone", header: "Phone" },
     { accessorKey: "email", header: "Email" },
+    { accessorKey: "role", header: "Role" },
     { accessorKey: "address", header: "Address" },
     { accessorKey: "isVerified", header: "Account Verified" },
     { accessorKey: "isDeleted", header: "Account Deleted" },
@@ -81,7 +124,9 @@ const ClientTable = () => {
           return (
             <td
               key={cell.id}
-              onClick={() => handleGotoProfile(cell.row.original.id)}
+              onClick={() =>
+                handleGotoProfile(cell.row.original.id, cell.row.original.role)
+              }
               className="py-4 p-6"
             >
               <TableText
@@ -97,7 +142,9 @@ const ClientTable = () => {
           return (
             <td
               key={cell.id}
-              onClick={() => handleGotoProfile(cell.row.original.id)}
+              onClick={() =>
+                handleGotoProfile(cell.row.original.id, cell.row.original.role)
+              }
               className="py-4 p-6"
             >
               <TableText
@@ -113,7 +160,9 @@ const ClientTable = () => {
           return (
             <td
               key={cell.id}
-              onClick={() => handleGotoProfile(cell.row.original.id)}
+              onClick={() =>
+                handleGotoProfile(cell.row.original.id, cell.row.original.role)
+              }
               className="py-4 p-6"
             >
               <TableText
@@ -124,11 +173,27 @@ const ClientTable = () => {
           );
         }
 
+        if (cell.column.id === "role") {
+          return (
+            <td
+              key={cell.id}
+              onClick={() =>
+                handleGotoProfile(cell.row.original.id, cell.row.original.role)
+              }
+              className="py-4 p-6"
+            >
+              <UserRoleBadge role={cell.row.original.role} />
+            </td>
+          );
+        }
+
         // Default
         return (
           <td
             key={cell.id}
-            onClick={() => handleGotoProfile(cell.row.original.id)}
+            onClick={() =>
+              handleGotoProfile(cell.row.original.id, cell.row.original.role)
+            }
             className={`py-4 p-6 ${
               cell.column.id === "action" ? "action-column" : ""
             }`}
@@ -140,16 +205,18 @@ const ClientTable = () => {
     </tr>
   );
 
-  const [pageIndex, setPageIndex] = useState(PAGINATION_DEFAULT.page);
-  const [pageSize, setPageSize] = useState(PAGINATION_DEFAULT.limit);
-  const [sorting, setSorting] = useState<SortingState>([]);
-  const [globalFilter, setGlobalFilter] = useState("");
+  const [pageIndex, setPageIndex] = useState(defaultPageIndex);
+  const [pageSize, setPageSize] = useState(defaultPageSize);
+  const [sorting, setSorting] = useState<SortingState>(defaultSorting);
+  const [globalFilter, setGlobalFilter] = useState(defaultGlobalFilter);
   const clientStatus = query.get("tab") || "";
 
   // State for filters
-  const [isDeleted, setIsDeleted] = useState<boolean | undefined>(false);
+  const [isDeleted, setIsDeleted] = useState<boolean | undefined>(
+    defaultIsDeleted
+  );
   const [isRequestDelete, setIsRequestDelete] = useState<boolean | undefined>(
-    false
+    defaultIsRequestDelete
   );
 
   // Fetch the clients using your actual API
@@ -162,7 +229,7 @@ const ClientTable = () => {
   } = ApiClientStoreSlice.useGetClientsQuery({
     pageIndex,
     pageSize,
-    sorting,
+    sorting: sorting.map(({ id, desc }) => ({ id, desc })),
     globalFilter,
     isDeleted, // Pass isDeleted filter
     isRequestDelete, // Pass isRequestDelete filter
@@ -185,7 +252,8 @@ const ClientTable = () => {
     return isDeletedMatch && requestDeleteMatch;
   });
 
-  const pageCount = clientsResponse?.data?.pageCount;
+  const totalItems = clientsResponse?.data?.count || 0;
+  const pageCount = Math.ceil(totalItems / pageSize);
 
   const fetchData = (
     pageIndex: number,
@@ -205,6 +273,76 @@ const ClientTable = () => {
     fetchData(pageIndex, pageSize, sorting, globalFilter);
   }, [pageIndex, pageSize, sorting, globalFilter, isDeleted, isRequestDelete]);
 
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const sortingValue = sorting?.length
+      ? `${sorting[0].id},${sorting[0].desc ? "desc" : "asc"}`
+      : "";
+    const isDefaultSorting =
+      sortingValue === `${DEFAULT_CLIENT_SORTING[0].id},${
+        DEFAULT_CLIENT_SORTING[0].desc ? "desc" : "asc"
+      }`;
+
+    if (pageIndex > 0) {
+      params.set("page", String(pageIndex + 1));
+    } else {
+      params.delete("page");
+    }
+
+    if (pageSize !== PAGINATION_DEFAULT.limit) {
+      params.set("limit", String(pageSize));
+    } else {
+      params.delete("limit");
+    }
+
+    if (globalFilter) {
+      params.set("q", globalFilter);
+    } else {
+      params.delete("q");
+    }
+
+    if (sortingValue && !isDefaultSorting) {
+      params.set("sort", sortingValue);
+    } else {
+      params.delete("sort");
+    }
+
+    if (isDeleted) {
+      params.set("isDeleted", "true");
+    } else {
+      params.delete("isDeleted");
+    }
+
+    if (isRequestDelete) {
+      params.set("isRequestDelete", "true");
+    } else {
+      params.delete("isRequestDelete");
+    }
+
+    const nextSearch = params.toString();
+    const currentSearch = location.search.replace(/^\?/, "");
+
+    if (nextSearch !== currentSearch) {
+      navigate(
+        {
+          pathname: location.pathname,
+          search: nextSearch,
+        },
+        { replace: true }
+      );
+    }
+  }, [
+    globalFilter,
+    isDeleted,
+    isRequestDelete,
+    location.pathname,
+    location.search,
+    navigate,
+    pageIndex,
+    pageSize,
+    sorting,
+  ]);
+
   if (isError) {
     showErrorSnackbar(error?.message || "Error occured");
   }
@@ -216,30 +354,34 @@ const ClientTable = () => {
   return (
     <>
       {filteredClients.length <= 0 ? (
-        <div className="flex items-center gap-3 mt-4">
-          <Search
-            globalFilter={globalFilter}
-            setGlobalFilter={setGlobalFilter}
-          />
+        <div className="table-toolbar">
+          <div className="table-toolbar-search">
+            <Search
+              globalFilter={globalFilter}
+              setGlobalFilter={setGlobalFilter}
+            />
+          </div>
 
-          <Filter
-            isDeleted={isDeleted}
-            setIsDeleted={setIsDeleted}
-            isRequestDelete={isRequestDelete}
-            setIsRequestDelete={setIsRequestDelete}
-          />
+          <div className="table-toolbar-actions">
+            <Filter
+              isDeleted={isDeleted}
+              setIsDeleted={setIsDeleted}
+              isRequestDelete={isRequestDelete}
+              setIsRequestDelete={setIsRequestDelete}
+            />
 
-          <Button
-            variant="outlined"
-            startIcon={<Share01 width={20} height={20} />}
-            className="capitalize font-bold font-inter flex items-center justify-center"
-            size="medium"
-            onClick={handleExportCSV}
-          >
-            <Tooltip title="Download CSV">
-              <p>Export</p>
-            </Tooltip>
-          </Button>
+            <Button
+              variant="outlined"
+              startIcon={<Share01 width={20} height={20} />}
+              className="capitalize font-bold font-inter flex items-center justify-center"
+              size="medium"
+              onClick={handleExportCSV}
+            >
+              <Tooltip title="Download CSV">
+                <p>Export</p>
+              </Tooltip>
+            </Button>
+          </div>
         </div>
       ) : null}
 
@@ -256,6 +398,10 @@ const ClientTable = () => {
           columns={columns}
           data={filteredClients}
           pageCount={pageCount}
+          defaultSorting={defaultSorting}
+          defaultGlobalFilter={defaultGlobalFilter}
+          defaultPageIndex={defaultPageIndex}
+          defaultPageSize={defaultPageSize}
           fetchData={fetchData}
           PaginationComponent={Pagination}
           SearchComponent={Search}

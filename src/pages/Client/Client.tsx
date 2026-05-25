@@ -26,7 +26,7 @@ const Client: FC<ClientProps> = () => {
 
   const breadcrumbItems: BreadcrumbItem[] = [
     { path: routeEnum.USERS, label: "Users", disabled: true },
-    { path: routeEnum.USERS_CLIENTS, label: "Clients" },
+    { path: routeEnum.USERS_CLIENTS, label: "Users" },
   ];
 
   const tabs: TabItem[] = [
@@ -58,7 +58,7 @@ const Client: FC<ClientProps> = () => {
               color="grey.900"
               className="font-bold text-2xl font-crimson"
             >
-              Clients
+              Users
             </Typography>
           </div>
         </div>
@@ -69,7 +69,7 @@ const Client: FC<ClientProps> = () => {
           className="capitalize font-bold font-inter"
           size="large"
         >
-          Add New Client
+          Add New User
         </Button>
       </div>
 
@@ -78,7 +78,7 @@ const Client: FC<ClientProps> = () => {
           value={currentTabIndex === -1 ? 0 : currentTabIndex}
           variant="scrollable"
           scrollButtons={false}
-          aria-label="client tabs"
+          aria-label="user tabs"
         >
           {tabs.map((tab) => (
             <Tab

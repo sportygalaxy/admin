@@ -32,7 +32,7 @@ const Employee: FC<EmployeeProps> = () => {
 
   const breadcrumbItems: BreadcrumbItem[] = [
     { path: routeEnum.USERS, label: "Users", disabled: true },
-    { path: routeEnum.USERS_EMPLOYEES, label: "Employees" },
+    { path: routeEnum.USERS_EMPLOYEES, label: "Team" },
   ];
 
   const tabs: TabItem[] = [
@@ -64,7 +64,7 @@ const Employee: FC<EmployeeProps> = () => {
               color="grey.900"
               className="font-bold text-2xl font-crimson"
             >
-              Employees
+              Team
             </Typography>
           </div>
         </div>
@@ -75,7 +75,7 @@ const Employee: FC<EmployeeProps> = () => {
           className="capitalize font-bold font-inter"
           size="large"
         >
-          Add New Employee
+          Add New Team Member
         </Button>
       </div>
 
@@ -84,7 +84,7 @@ const Employee: FC<EmployeeProps> = () => {
           value={currentTabIndex === -1 ? 0 : currentTabIndex}
           variant="scrollable"
           scrollButtons={false}
-          aria-label="employee tabs"
+          aria-label="team tabs"
         >
           {tabs.map((tab) => (
             <Tab

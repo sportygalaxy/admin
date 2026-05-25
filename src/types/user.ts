@@ -1,3 +1,4 @@
+import { type UserRole } from "@/constants/roles";
 import { ServerResponse } from "./global";
 
 export interface User{
@@ -15,6 +16,7 @@ export interface User{
     updatedAt:string;
     deletedAt:string;
     token:string;
+    role: UserRole;
 }
 
 export type AuthUserResponse = ServerResponse<User>;

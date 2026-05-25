@@ -21,9 +21,15 @@ import {
   Users01,
 } from "@untitled-ui/icons-react";
 import useLogout from "./hooks/useLogout";
+import useAuthUser from "./hooks/useAuthUser";
+import {
+  ROLE_MANAGEMENT_ACCESS_ROLES,
+  type UserRole,
+} from "./constants/roles";
 
 type Props = {
   className?: string;
+  onNavigate?: () => void;
 };
 
 type LinkType = {
@@ -78,49 +84,13 @@ const BOTTOM_LINKS: LinkType[] = [
   },
 ];
 
-const ACCORDION_LINKS: AccordionLinkType[] = [
-  {
-    title: "Products",
-    icon: <SearchLg color="black" />,
-    subLinks: [
-      {
-        title: "Products",
-        icon: <></>,
-        path: routeEnum.PRODUCTS,
-      },
-      {
-        title: "Colors",
-        icon: <></>,
-        path: routeEnum.PRODUCT_COLORS,
-      },
-      {
-        title: "Sizes",
-        icon: <></>,
-        path: routeEnum.PRODUCT_SIZES,
-      },
-    ],
-    isAccordion: true,
-  },
-  {
-    title: "Users",
-    icon: <Users01 color="black" />,
-    subLinks: [
-      {
-        title: "Clients",
-        icon: <></>,
-        path: routeEnum.USERS_CLIENTS,
-      },
-      {
-        title: "Employees",
-        icon: <></>,
-        path: routeEnum.USERS_EMPLOYEES,
-      },
-    ],
-    isAccordion: true,
-  },
-];
-
-const NavLinkItem = ({ title, icon, path, isAccordion }: LinkType) => {
+const NavLinkItem = ({
+  title,
+  icon,
+  path,
+  isAccordion,
+  onNavigate,
+}: LinkType & { onNavigate?: () => void }) => {
   const { logout } = useLogout();
 
   const defaultClass = `flex items-center w-full py-3 px-3 ${
@@ -131,6 +101,7 @@ const NavLinkItem = ({ title, icon, path, isAccordion }: LinkType) => {
       {path ? (
         <NavLink
           to={path}
+          onClick={onNavigate}
           className={({ isActive }) =>
             isActive
               ? `${defaultClass} rounded-lg bg-[#A6F4C5] bg-${theme.palette.primary.main}`
@@ -143,7 +114,13 @@ const NavLinkItem = ({ title, icon, path, isAccordion }: LinkType) => {
           </span>
         </NavLink>
       ) : (
-        <div onClick={logout} className={`${defaultClass} cursor-pointer`}>
+        <div
+          onClick={() => {
+            onNavigate?.();
+            logout();
+          }}
+          className={`${defaultClass} cursor-pointer`}
+        >
           {icon}
           <span className="ml-3 text-base font-medium text-black capitalize font-inter">
             {title}
@@ -154,7 +131,12 @@ const NavLinkItem = ({ title, icon, path, isAccordion }: LinkType) => {
   );
 };
 
-const NavAccordion = ({ title, icon, subLinks }: AccordionLinkType) => {
+const NavAccordion = ({
+  title,
+  icon,
+  subLinks,
+  onNavigate,
+}: AccordionLinkType & { onNavigate?: () => void }) => {
   const [expanded, setExpanded] = React.useState(false);
 
   const handleChange = () => {
@@ -201,6 +183,7 @@ const NavAccordion = ({ title, icon, subLinks }: AccordionLinkType) => {
             icon={icon}
             path={path}
             isAccordion
+            onNavigate={onNavigate}
           />
         ))}
       </AccordionDetails>
@@ -208,7 +191,62 @@ const NavAccordion = ({ title, icon, subLinks }: AccordionLinkType) => {
   );
 };
 
-const AppProtectedSideMenu: React.FC<Props> = ({ className = "" }) => {
+const AppProtectedSideMenu: React.FC<Props> = ({
+  className = "",
+  onNavigate,
+}) => {
+  const user = useAuthUser();
+  const isRoleManager = ROLE_MANAGEMENT_ACCESS_ROLES.includes(
+    user?.role as UserRole
+  );
+  const userAccordionLinks: LinkType[] = [
+    {
+      title: "Users",
+      icon: <></>,
+      path: routeEnum.USERS_CLIENTS,
+    },
+    ...(isRoleManager
+      ? [
+          {
+            title: "Roles",
+            icon: <></>,
+            path: routeEnum.USERS_ROLES,
+          },
+        ]
+      : []),
+  ];
+
+  const ACCORDION_LINKS: AccordionLinkType[] = [
+    {
+      title: "Products",
+      icon: <SearchLg color="black" />,
+      subLinks: [
+        {
+          title: "Products",
+          icon: <></>,
+          path: routeEnum.PRODUCTS,
+        },
+        {
+          title: "Colors",
+          icon: <></>,
+          path: routeEnum.PRODUCT_COLORS,
+        },
+        {
+          title: "Sizes",
+          icon: <></>,
+          path: routeEnum.PRODUCT_SIZES,
+        },
+      ],
+      isAccordion: true,
+    },
+    {
+      title: "Users",
+      icon: <Users01 color="black" />,
+      subLinks: userAccordionLinks,
+      isAccordion: true,
+    },
+  ];
+
   // Combine normal links and accordion links
   const COMBINED_LINKS: CombinedLinkType[] = [
     ...NORMAL_LINKS.slice(0, 1), // "Dashboard"
@@ -228,21 +266,21 @@ const AppProtectedSideMenu: React.FC<Props> = ({ className = "" }) => {
       sx={{
         backgroundColor: theme.palette.grey[100],
       }}
-      className={`fixed z-[1000] top-0 left-0 pt-[40px] pb-[30px] px-[30px] h-[100svh] flex flex-col item-center justify-between sm:!static ${className} bg-grey-100 xl:min-w-[300px] w-full`}
+      className={`flex h-full min-h-screen w-full flex-col justify-between bg-grey-100 px-5 pb-6 pt-6 md:px-6 lg:min-h-0 lg:px-[30px] lg:pb-[30px] lg:pt-[40px] xl:min-w-[300px] ${className}`}
     >
       {/* Top section with logo and links */}
       <div>
         <div>
-          <Link to={routeEnum.DASHBOARD}>
+          <Link to={routeEnum.DASHBOARD} onClick={onNavigate}>
             <img src={SportygalaxyLogo} alt="logo" />
           </Link>
         </div>
         <nav className="pt-[50px]">
           {COMBINED_LINKS.map((link, index) =>
             isAccordionLink(link) ? (
-              <NavAccordion key={index} {...link} />
+              <NavAccordion key={index} {...link} onNavigate={onNavigate} />
             ) : (
-              <NavLinkItem key={index} {...link} />
+              <NavLinkItem key={index} {...link} onNavigate={onNavigate} />
             )
           )}
         </nav>
@@ -252,7 +290,7 @@ const AppProtectedSideMenu: React.FC<Props> = ({ className = "" }) => {
       <div>
         <nav className="pt-4">
           {BOTTOM_LINKS.map((link, index) => (
-            <NavLinkItem key={index} {...link} />
+            <NavLinkItem key={index} {...link} onNavigate={onNavigate} />
           ))}
         </nav>
       </div>

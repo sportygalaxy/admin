@@ -22,6 +22,7 @@ export const routeEnum = {
   // Client
   USERS_CLIENTS: "/users/client-list",
   USERS_CLIENT_DETAILS: "/users/client-profile/:id",
+  USERS_ROLES: "/users/role-management",
 
   // Employee
   USERS_EMPLOYEES: "/users/employee-list",

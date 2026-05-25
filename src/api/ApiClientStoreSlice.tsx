@@ -26,7 +26,7 @@ export const ApiClientStoreSlice = sportygalaxyAdminApi.injectEndpoints({
       }) => {
         let params = new URLSearchParams({
           page: (pageIndex + 1).toString(), // Ensure 1-based index
-          limit: pageSize,
+          limit: pageSize.toString(),
           ...(globalFilter && { q: globalFilter }),
           ...(clientStatus && { search: clientStatus }),
           ...(isDeleted && { isDeleted }),

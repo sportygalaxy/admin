@@ -11,15 +11,13 @@ import { ColumnDef, SortingState } from "@tanstack/react-table";
 import ReusableTable from "@/common/Table/ReuseableTable";
 import { Pagination } from "@/common/Table/Pagination";
 import Search from "@/common/Table/Search";
-
 import Filter from "@/common/Table/Filter";
-
-import { generatePath, Link, useNavigate } from "react-router-dom";
+import { generatePath, Link, useLocation, useNavigate } from "react-router-dom";
 import { routeEnum } from "@/constants/RouteConstants";
 import TableText from "@/common/Table/TableText";
 import { ApiProductStoreSlice } from "@/api/ApiProductStoreSlice";
 import { TABLE_ROW_TYPE } from "@/constants/enums";
-// import { useQuery } from "@/hooks/useQuery";
+import { useQuery } from "@/hooks/useQuery";
 import TableSkeletonLoader from "@/common/Table/TableSkeletonLoader";
 import TableEmpty from "@/common/Table/TableEmpty";
 import { User } from "@/types/user";
@@ -29,13 +27,48 @@ import TableError from "@/common/Table/TableError";
 import { exportToCSV } from "@/helpers/exportToCSV";
 import { PAGINATION_DEFAULT } from "@/constants/AppConstants";
 import PopupState, { bindPopover, bindTrigger } from "material-ui-popup-state";
-import { useQueryParam } from "@/hooks/useQueryParam";
+
+const DEFAULT_PRODUCT_SORTING: SortingState = [
+  { id: "createdAt", desc: true },
+];
+
+const parsePositiveInteger = (value: string | null, fallback: number) => {
+  const parsedValue = Number(value);
+
+  return Number.isInteger(parsedValue) && parsedValue > 0
+    ? parsedValue
+    : fallback;
+};
+
+const parseProductSorting = (value: string | null): SortingState => {
+  if (!value) {
+    return DEFAULT_PRODUCT_SORTING;
+  }
+
+  const [id, direction] = value.split(",");
+
+  if (!id) {
+    return DEFAULT_PRODUCT_SORTING;
+  }
+
+  return [{ id, desc: direction !== "asc" }];
+};
 
 const ProductTable = () => {
-  // const query = useQuery();
-  const { get } = useQueryParam();
+  const query = useQuery();
+  const location = useLocation();
   const { showErrorSnackbar } = useExtendedSnackbar();
   const navigate = useNavigate();
+  const defaultSorting = parseProductSorting(query.get("sort"));
+  const defaultPageIndex =
+    parsePositiveInteger(query.get("page"), PAGINATION_DEFAULT.page) - 1;
+  const defaultPageSize = parsePositiveInteger(
+    query.get("limit"),
+    PAGINATION_DEFAULT.limit
+  );
+  const defaultGlobalFilter = query.get("q") || "";
+  const defaultIsDeleted = query.get("isDeleted") === "true";
+  const defaultIsRequestDelete = query.get("isRequestDelete") === "true";
 
   const handleGotoProduct = (id: string) => {
     const route = generatePath(routeEnum.PRODUCT_DETAILS, {
@@ -127,23 +160,29 @@ const ProductTable = () => {
   // Custom renderHeader function
   const renderHeader = (headerGroup: HeaderGroup<User>) => (
     <>
-      {headerGroup.headers.map((header) => (
-        <th key={header.id} className="py-3 font-medium p-6">
-          <div
-            {...{
-              onClick: header.column.getToggleSortingHandler(),
-              style: { cursor: "pointer" },
-            }}
-          >
-            {flexRender(header.column.columnDef.header, header.getContext())}
-            {header.column.getIsSorted()
-              ? header.column.getIsSorted() === "desc"
-                ? " ▼"
-                : " ▲"
-              : null}
-          </div>
-        </th>
-      ))}
+      {headerGroup.headers.map((header) => {
+        const canSort = header.column.getCanSort();
+
+        return (
+          <th key={header.id} className="py-3 font-medium p-6">
+            <div
+              {...{
+                onClick: canSort
+                  ? header.column.getToggleSortingHandler()
+                  : undefined,
+                style: { cursor: canSort ? "pointer" : "default" },
+              }}
+            >
+              {flexRender(header.column.columnDef.header, header.getContext())}
+              {header.column.getIsSorted()
+                ? header.column.getIsSorted() === "desc"
+                  ? " ▼"
+                  : " ▲"
+                : null}
+            </div>
+          </th>
+        );
+      })}
     </>
   );
 
@@ -317,17 +356,18 @@ const ProductTable = () => {
     </tr>
   );
 
-  const [pageIndex, setPageIndex] = useState(PAGINATION_DEFAULT.page);
-  const [pageSize, setPageSize] = useState(PAGINATION_DEFAULT.limit);
-  const [sorting, setSorting] = useState<SortingState>([]);
-  const [globalFilter, setGlobalFilter] = useState("");
-  const productStatus = get("tab") || "";
-  const pageIndexFromUrl = get("page") || pageIndex;
+  const [pageIndex, setPageIndex] = useState(defaultPageIndex);
+  const [pageSize, setPageSize] = useState(defaultPageSize);
+  const [sorting, setSorting] = useState<SortingState>(defaultSorting);
+  const [globalFilter, setGlobalFilter] = useState(defaultGlobalFilter);
+  const productStatus = query.get("tab") || "";
 
   // State for filters
-  const [isDeleted, setIsDeleted] = useState<boolean | undefined>(false);
+  const [isDeleted, setIsDeleted] = useState<boolean | undefined>(
+    defaultIsDeleted
+  );
   const [isRequestDelete, setIsRequestDelete] = useState<boolean | undefined>(
-    false
+    defaultIsRequestDelete
   );
 
   // Fetch the products using your actual API
@@ -338,12 +378,9 @@ const ProductTable = () => {
     refetch,
     error,
   } = ApiProductStoreSlice.useGetProductsQuery({
-    // ...(globalFilter && {
-    //   pageIndex: Number(pageIndexFromUrl) || pageIndex,
-    // }),
-    pageIndex: Number(pageIndexFromUrl) || pageIndex,
+    pageIndex,
     pageSize,
-    sorting,
+    sorting: sorting.map(({ id, desc }) => ({ id, desc })),
     globalFilter,
     isDeleted, // Pass isDeleted filter
     isRequestDelete, // Pass isRequestDelete filter
@@ -366,7 +403,7 @@ const ProductTable = () => {
     return isDeletedMatch && requestDeleteMatch;
   });
 
-  const totalItems = productsResponse?.data?.count;
+  const totalItems = productsResponse?.data?.count || 0;
   const pageCount = Math.ceil(totalItems / pageSize);
 
   const fetchData = (
@@ -375,7 +412,7 @@ const ProductTable = () => {
     sorting: SortingState,
     globalFilter: string
   ) => {
-    setPageIndex(Number(pageIndexFromUrl) || pageIndex);
+    setPageIndex(pageIndex);
     setPageSize(pageSize);
     setSorting(sorting);
     setGlobalFilter(globalFilter);
@@ -384,15 +421,73 @@ const ProductTable = () => {
   };
 
   useEffect(() => {
-    fetchData(pageIndex, pageSize, sorting, globalFilter);
+    const params = new URLSearchParams(location.search);
+    const sortingValue = sorting?.length
+      ? `${sorting[0].id},${sorting[0].desc ? "desc" : "asc"}`
+      : "";
+    const isDefaultSorting =
+      sortingValue === `${DEFAULT_PRODUCT_SORTING[0].id},${
+        DEFAULT_PRODUCT_SORTING[0].desc ? "desc" : "asc"
+      }`;
+
+    if (pageIndex > 0) {
+      params.set("page", String(pageIndex + 1));
+    } else {
+      params.delete("page");
+    }
+
+    if (pageSize !== PAGINATION_DEFAULT.limit) {
+      params.set("limit", String(pageSize));
+    } else {
+      params.delete("limit");
+    }
+
+    if (globalFilter) {
+      params.set("q", globalFilter);
+    } else {
+      params.delete("q");
+    }
+
+    if (sortingValue && !isDefaultSorting) {
+      params.set("sort", sortingValue);
+    } else {
+      params.delete("sort");
+    }
+
+    if (isDeleted) {
+      params.set("isDeleted", "true");
+    } else {
+      params.delete("isDeleted");
+    }
+
+    if (isRequestDelete) {
+      params.set("isRequestDelete", "true");
+    } else {
+      params.delete("isRequestDelete");
+    }
+
+    const nextSearch = params.toString();
+    const currentSearch = location.search.replace(/^\?/, "");
+
+    if (nextSearch !== currentSearch) {
+      navigate(
+        {
+          pathname: location.pathname,
+          search: nextSearch,
+        },
+        { replace: true }
+      );
+    }
   }, [
-    pageIndex,
-    pageSize,
-    sorting,
     globalFilter,
     isDeleted,
     isRequestDelete,
-    pageIndexFromUrl,
+    location.pathname,
+    location.search,
+    navigate,
+    pageIndex,
+    pageSize,
+    sorting,
   ]);
 
   if (isError) {
@@ -406,30 +501,34 @@ const ProductTable = () => {
   return (
     <>
       {filteredProducts.length <= 0 ? (
-        <div className="flex items-center gap-3 mt-4">
-          <Search
-            globalFilter={globalFilter}
-            setGlobalFilter={setGlobalFilter}
-          />
+        <div className="table-toolbar mt-4">
+          <div className="table-toolbar-search">
+            <Search
+              globalFilter={globalFilter}
+              setGlobalFilter={setGlobalFilter}
+            />
+          </div>
 
-          <Filter
-            isDeleted={isDeleted}
-            setIsDeleted={setIsDeleted}
-            isRequestDelete={isRequestDelete}
-            setIsRequestDelete={setIsRequestDelete}
-          />
+          <div className="table-toolbar-actions">
+            <Filter
+              isDeleted={isDeleted}
+              setIsDeleted={setIsDeleted}
+              isRequestDelete={isRequestDelete}
+              setIsRequestDelete={setIsRequestDelete}
+            />
 
-          <Button
-            variant="outlined"
-            startIcon={<Share01 width={20} height={20} />}
-            className="capitalize font-bold font-inter flex items-center justify-center"
-            size="medium"
-            onClick={handleExportCSV}
-          >
-            <Tooltip title="Download CSV">
-              <p>Export</p>
-            </Tooltip>
-          </Button>
+            <Button
+              variant="outlined"
+              startIcon={<Share01 width={20} height={20} />}
+              className="capitalize font-bold font-inter flex items-center justify-center"
+              size="medium"
+              onClick={handleExportCSV}
+            >
+              <Tooltip title="Download CSV">
+                <p>Export</p>
+              </Tooltip>
+            </Button>
+          </div>
         </div>
       ) : null}
 
@@ -446,6 +545,10 @@ const ProductTable = () => {
           columns={columns}
           data={filteredProducts}
           pageCount={pageCount}
+          defaultSorting={defaultSorting}
+          defaultGlobalFilter={defaultGlobalFilter}
+          defaultPageIndex={defaultPageIndex}
+          defaultPageSize={defaultPageSize}
           fetchData={fetchData}
           PaginationComponent={Pagination}
           SearchComponent={Search}
