@@ -289,7 +289,7 @@ const AppProtectedSideMenu: React.FC<Props> = ({
       {/* Bottom section with settings and logout */}
       <div>
         <nav className="pt-4">
-          {BOTTOM_LINKS.map((link, index) => (
+          {BOTTOM_LINKS.filter((link) => link.path !== routeEnum.SETTINGS || isRoleManager).map((link, index) => (
             <NavLinkItem key={index} {...link} onNavigate={onNavigate} />
           ))}
         </nav>

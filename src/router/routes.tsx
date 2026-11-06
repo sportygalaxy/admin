@@ -36,6 +36,7 @@ const Transaction = lazy(() => import("@/pages/Transaction/Transaction"));
 const UserRoleManagement = lazy(
   () => import("@/pages/UserRole/UserRole")
 );
+const SeasonalSettings = lazy(() => import("@/pages/Settings/SeasonalSettings"));
 
 const AuthLogin = lazy(() => import("@/pages/Auth/AuthLogin"));
 
@@ -160,6 +161,16 @@ export const ProtectedRoutes: ExtendedRouteObject[] = [
       {
         path: routeEnum.TRANSACTIONS,
         element: <Transaction />,
+        errorElement: <ErrorBoundaryRoot />,
+      },
+      {
+        path: routeEnum.SETTINGS,
+        element: (
+          <AuthGuard
+            route={{ allowedRoles: ROLE_MANAGEMENT_ACCESS_ROLES }}
+            component={<SeasonalSettings />}
+          />
+        ),
         errorElement: <ErrorBoundaryRoot />,
       },
     ],

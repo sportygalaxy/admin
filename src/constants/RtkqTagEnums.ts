@@ -18,4 +18,5 @@ export const RtkqTagEnum = {
 
   TRANSACTIONS: "TRANSACTIONS",
   REVIEWS: "REVIEWS",
+  SEASONAL: "SEASONAL",
 };
