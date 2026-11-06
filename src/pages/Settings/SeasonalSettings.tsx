@@ -112,7 +112,7 @@ export default function SeasonalSettingsPage() {
       ) : loadError || !draft || !campaign ? (
         <Alert severity="error" className="mt-10">Could not load seasonal settings. Refresh the page to retry.</Alert>
       ) : (
-        <div className="mt-10 max-w-5xl space-y-6">
+        <div className="mt-10 space-y-6">
           {isDeveloper && (
             <section className="rounded-xl border border-[#EAECF0] bg-white p-5 md:p-6">
               <Typography color="grey.900" className="text-lg font-semibold font-inter">Storefront activation</Typography>
@@ -189,6 +189,32 @@ export default function SeasonalSettingsPage() {
                     multiline minRows={3} placeholder="Describe the campaign" inputProps={{ maxLength: 240 }}
                     value={campaign.description} onChange={(event) => updateCampaign({ description: event.target.value })} />
                 </div>
+                {theme !== "easter" && <>
+                <div className="space-y-2 md:col-span-2">
+                  <Typography component="label" htmlFor="seasonal-announcement" color="grey.700" className={labelClass}>Announcement bar text</Typography>
+                  <TextField id="seasonal-announcement" size="small" className={fieldClass} fullWidth required
+                    inputProps={{ maxLength: 160 }} value={campaign.announcementText}
+                    onChange={(event) => updateCampaign({ announcementText: event.target.value })} />
+                </div>
+                <div className="space-y-2">
+                  <Typography component="label" htmlFor="seasonal-announcement-href" color="grey.700" className={labelClass}>Announcement destination</Typography>
+                  <TextField id="seasonal-announcement-href" size="small" className={fieldClass} fullWidth required
+                    placeholder="/products" helperText="Use a path on this website, beginning with /." inputProps={{ maxLength: 240 }}
+                    value={campaign.announcementHref} onChange={(event) => updateCampaign({ announcementHref: event.target.value })} />
+                </div>
+                <div className="space-y-2">
+                  <Typography component="label" htmlFor="seasonal-cta-label" color="grey.700" className={labelClass}>Hero button text</Typography>
+                  <TextField id="seasonal-cta-label" size="small" className={fieldClass} fullWidth required
+                    inputProps={{ maxLength: 40 }} value={campaign.ctaLabel}
+                    onChange={(event) => updateCampaign({ ctaLabel: event.target.value })} />
+                </div>
+                <div className="space-y-2 md:col-span-2">
+                  <Typography component="label" htmlFor="seasonal-cta-href" color="grey.700" className={labelClass}>Hero button destination</Typography>
+                  <TextField id="seasonal-cta-href" size="small" className={fieldClass} fullWidth required
+                    placeholder="/products" helperText="Use a path on this website, beginning with /." inputProps={{ maxLength: 240 }}
+                    value={campaign.ctaHref} onChange={(event) => updateCampaign({ ctaHref: event.target.value })} />
+                </div>
+                </>}
                 <div className="space-y-2">
                   <Typography component="label" htmlFor="seasonal-start" color="grey.700" className={labelClass}>Starts</Typography>
                   <TextField id="seasonal-start" type="datetime-local" size="small" className={fieldClass} fullWidth

@@ -6,6 +6,10 @@ export type SeasonalCampaign = {
   title: string;
   headline: string;
   description: string;
+  announcementText: string;
+  announcementHref: string;
+  ctaLabel: string;
+  ctaHref: string;
   productIds: string[];
 };
 export type SeasonalSettings = {
